@@ -1,4 +1,5 @@
 import logging
+import json # Added for json.dumps
 from fastapi import FastAPI, HTTPException, Depends, Query
 from pydantic import BaseModel, HttpUrl, ValidationError, Field, root_validator
 from sqlalchemy.orm import Session
@@ -111,8 +112,8 @@ async def transcribe_video(
                     raise HTTPException(status_code=500, detail=f"Failed to transcribe video ID {db_video.youtube_video_id} (existing record).")
 
                 db_video.transcript = transcript_text
-                db_video.status = "processed"  # Update status
-                print(f"DEBUG: Updating DB for {db_video.youtube_video_id} with new transcript.")
+                db_video.status = "transcribed"  # Update status
+                print(f"DEBUG: Updating DB for {db_video.youtube_video_id} with new transcript and status 'transcribed'.")
                 db.commit()
                 db.refresh(db_video)
                 
@@ -151,9 +152,9 @@ async def transcribe_video(
                 youtube_video_id=youtube_id_from_request,
                 title=video_title,
                 transcript=transcript_text,
-                status="processed"  # Set status for new video
+                status="transcribed"  # Set status for new video
             )
-            print(f"DEBUG: Adding new video {youtube_id_from_request} to DB session.")
+            print(f"DEBUG: Adding new video {youtube_id_from_request} to DB session with status 'transcribed'.")
             db.add(new_video)
             print(f"DEBUG: Committing new video {youtube_id_from_request} to DB.")
             db.commit()
@@ -170,15 +171,15 @@ async def transcribe_video(
 
     except HTTPException as http_exc:
         logging.error(f"HTTPException in /transcribe/ for {youtube_id_from_request}: {http_exc.status_code} - {http_exc.detail}")
-        if db.is_active: db.rollback()
+        if db.is_active and db.in_transaction(): db.rollback()
         raise http_exc
     except ValidationError as ve: # For request model validation
         logging.error(f"ValidationError in /transcribe/ for {youtube_id_from_request}: {str(ve)}")
-        if db.is_active: db.rollback()
+        if db.is_active and db.in_transaction(): db.rollback()
         raise HTTPException(status_code=400, detail=f"Invalid request: {str(ve)}")
     except Exception as e:
         logging.exception(f"Unexpected error in /transcribe/ for {youtube_id_from_request}: {str(e)}") # Changed to logging.exception
-        if db.is_active: db.rollback()
+        if db.is_active and db.in_transaction(): db.rollback()
         raise HTTPException(status_code=500, detail=f"An unexpected error occurred while processing video ID {youtube_id_from_request}: {str(e)}")
 
 # Removed /repurpose/ endpoint as its functionality is merged into /process-video/
@@ -247,7 +248,7 @@ async def process_video(
                 youtube_video_id=youtube_id_from_request,
                 title=video_title,
                 transcript=transcript_text,
-                status="transcribed"
+                status="transcribed"  # Set status to "transcribed"
             )
             # Step 3d: Save this new Video record to the database.
             db.add(db_video)
@@ -268,7 +269,7 @@ async def process_video(
                 )
             # Step 4a.ii: Update db_video.transcript and db_video.status. Save to DB.
             db_video.transcript = transcript_text
-            db_video.status = "transcribed"
+            db_video.status = "transcribed" # Ensure status is "transcribed"
             db.commit()
             db.refresh(db_video)
 
@@ -280,22 +281,71 @@ async def process_video(
                 raise HTTPException(status_code=500, detail=f"Transcript unavailable for repurposing for video ID '{db_video.youtube_video_id}'.")
 
             # Step 4b.ii.1: Call generate_content_ideas()
-            ideas_data = await loop.run_in_executor(executor, generate_content_ideas, db_video.transcript)
-            if ideas_data is None: # Assuming it can return None on failure
-                logging.error(f"Failed to generate content ideas for video ID {db_video.youtube_video_id}.")
-                raise HTTPException(status_code=500, detail=f"Failed to generate content ideas for video ID '{db_video.youtube_video_id}'.")
+            ideas_data_raw = await loop.run_in_executor(executor, generate_content_ideas, db_video.transcript)
+            
+            # Ensure ideas_data_raw is a list, even if generate_content_ideas returns None (e.g., if transcript was too short)
+            if ideas_data_raw is None: 
+                logging.warning(f"generate_content_ideas returned None for video ID {db_video.youtube_video_id}. Treating as empty list.")
+                ideas_data_raw = [] 
+
+            validated_ideas_list: List[ContentIdea] = []
+            if not isinstance(ideas_data_raw, list):
+                logging.error(f"Ideas data from generate_content_ideas is not a list for video ID {db_video.youtube_video_id}. Data: {ideas_data_raw}")
+                raise HTTPException(status_code=500, detail=f"Invalid structure for content ideas: Expected a list, got {type(ideas_data_raw).__name__}.")
+
+            for idea_dict in ideas_data_raw:
+                try:
+                    if not isinstance(idea_dict, dict):
+                        logging.error(f"Content idea item is not a dictionary for video ID {db_video.youtube_video_id}. Item: {idea_dict}")
+                        raise HTTPException(status_code=500, detail="Invalid structure for content idea item: Expected a dictionary.")
+                    idea_model = ContentIdea(**idea_dict)
+                    validated_ideas_list.append(idea_model)
+                except ValidationError as ve:
+                    logging.error(f"Validation error for a content idea for video ID {db_video.youtube_video_id}: {ve}. Idea: {idea_dict}")
+                    raise HTTPException(status_code=500, detail="Failed to validate content ideas structure.")
+            
+            # If ideas_data_raw was not empty but validated_ideas_list is, it means all items failed validation.
+            if ideas_data_raw and not validated_ideas_list:
+                logging.warning(f"No valid content ideas found after validation for video ID {db_video.youtube_video_id}, although raw ideas were present and all failed validation.")
+                # This scenario implies all ideas failed validation, which would have raised an HTTPException inside the loop.
+                # If the code reaches here, it means either ideas_data_raw was empty or all ideas were successfully validated.
+                # So, this specific error condition might not be reachable if ValidationError always raises.
+                # However, if an idea_dict was not a dict, and that error was handled differently (e.g. skipped), this could be relevant.
+                # Given the current logic, the exception in the loop is the primary guard.
+                # For safety, keeping a check, though it might be redundant.
+                raise HTTPException(status_code=500, detail=f"All content ideas failed validation for video ID '{db_video.youtube_video_id}'.")
 
             # Step 4b.ii.2: Call generate_specific_content_pieces()
-            # Assuming generate_specific_content_pieces(transcript, ideas_data) signature
-            content_pieces_data = await loop.run_in_executor(executor, generate_specific_content_pieces, db_video.transcript, ideas_data)
-            if content_pieces_data is None: # Assuming it can return None on failure
-                logging.error(f"Failed to generate specific content pieces for video ID {db_video.youtube_video_id}.")
+            # Signature from repurpose.py: generate_specific_content_pieces(ideas: List[ContentIdea], original_transcript: str, video_url: str)
+            content_pieces_data = await loop.run_in_executor(
+                executor,
+                generate_specific_content_pieces,
+                validated_ideas_list,  # Pass the list of ContentIdea objects
+                db_video.transcript,   # Pass the original transcript
+                db_video.youtube_video_id # Pass the video_id as video_url argument
+            )
+
+            if content_pieces_data is None: # generate_specific_content_pieces in repurpose.py returns GeneratedContentList, even if empty. So None is an error.
+                logging.error(f"Failed to generate specific content pieces for video ID {db_video.youtube_video_id}. Function returned None.")
                 raise HTTPException(status_code=500, detail=f"Failed to generate specific content pieces for video ID '{db_video.youtube_video_id}'.")
             
-            # Step 4b.iii: Store ideas_data and content_pieces_data.
-            db_video.repurposed_text = f"Ideas: {ideas_data}\nContent: {content_pieces_data}"
+            # Step 4b.iii: Store ideas_data (raw) and content_pieces_data.
+            # repurposed_text should be a single JSON string representing an object.
+            
+            try:
+                # Ensure ideas_data_raw (the direct output from generate_content_ideas, defaulted to [] if None) is used.
+                # Ensure content_pieces_data (output from generate_specific_content_pieces) is used.
+                repurposed_data_for_json = {
+                    "ideas": ideas_data_raw,  # This is List[Dict[str, Any]] from generate_content_ideas
+                    "content_pieces": content_pieces_data.model_dump() if content_pieces_data else {"pieces": []} # .model_dump() from Pydantic model
+                }
+                db_video.repurposed_text = json.dumps(repurposed_data_for_json)
+            except TypeError as te: # Catch errors during json.dumps if models are complex and not directly serializable
+                logging.error(f"Error serializing repurposed content to JSON for {db_video.youtube_video_id}: {te}")
+                raise HTTPException(status_code=500, detail="Error storing repurposed content due to serialization issue.")
+
             # Step 4b.iv: Update db_video.status.
-            db_video.status = "processed"
+            db_video.status = "processed" # Status becomes "processed" after successful repurposing
             # Step 4b.v: Save changes to the database.
             db.commit()
             db.refresh(db_video)
@@ -304,13 +354,13 @@ async def process_video(
         return db_video # Pydantic will convert using ProcessVideoResponse schema due to orm_mode=True
 
     except HTTPException as http_exc:
-        if db.is_active: db.rollback() # Rollback on known HTTP exceptions
+        if db.is_active and db.in_transaction(): db.rollback() 
         raise http_exc
     except ValidationError as ve: # For request model validation or response model issues
-        logging.error(f"ValidationError in /process-video/ for {youtube_id_from_request}: {str(ve)}")
-        if db.is_active: db.rollback()
+        logging.error(f"Pydantic ValidationError in /process-video/ for {youtube_id_from_request}: {str(ve)}")
+        if db.is_active and db.in_transaction(): db.rollback()
         raise HTTPException(status_code=400, detail=f"Invalid data: {str(ve)}")
     except Exception as e:
         logging.exception(f"Unexpected error in /process-video/ for {youtube_id_from_request}: {str(e)}")
-        if db.is_active: db.rollback()
+        if db.is_active and db.in_transaction(): db.rollback()
         raise HTTPException(status_code=500, detail=f"An unexpected error occurred while processing video ID {youtube_id_from_request}: {str(e)}")
