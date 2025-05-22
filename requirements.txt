@@ -1,0 +1,40 @@
+# Core Dependencies
+fastapi
+uvicorn
+python-dotenv
+pydantic
+pydantic-settings
+
+# Database
+sqlalchemy
+sqlmodel
+psutil
+alembic
+aiosqlite
+
+# Caching
+# redis # Removed Redis
+# aioredis # Removed Redis
+
+# Monitoring and Instrumentation
+prometheus-client
+prometheus-fastapi-instrumentator
+psutil
+
+# Testing
+# pytest
+# pytest-asyncio
+httpx
+requests
+
+# API Clients
+openai>=1.0.0
+youtube-transcript-api
+youtube-search-python
+yt-dlp
+scrapetube
+youtube-comment-downloader
+
+# Utilities
+pandas
+rich
