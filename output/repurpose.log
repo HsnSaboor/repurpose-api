@@ -1,0 +1,1026 @@
+2025-06-14 14:13:05,321 - INFO - [<module>] - Using Gemini model: gemini-1.5-flash-latest via Base URL: https://generativelanguage.googleapis.com/v1beta
+2025-06-14 14:13:06,944 - INFO - [__init__] - Rate limiter initialized: RPM=60, QPD=1500
+2025-06-14 14:13:07,000 - CRITICAL - [<module>] - Critical unhandled error during script execution.
+Traceback (most recent call last):
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\repurpose.py", line 550, in <module>
+    video_ids = parse_input_source(args.input_source)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\repurpose.py", line 436, in parse_input_source
+    video_id = extract_video_id(item)
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\repurpose.py", line 208, in extract_video_id
+    return match.group(1)
+           ^^^^^^^^^^^^^^
+IndexError: no such group
+2025-06-14 14:15:15,587 - INFO - [<module>] - Using Gemini model: gemini-1.5-flash-latest via Base URL: https://generativelanguage.googleapis.com/v1beta
+2025-06-14 14:15:16,423 - INFO - [__init__] - Rate limiter initialized: RPM=60, QPD=1500
+2025-06-14 14:15:16,437 - INFO - [parse_input_source] - Parsed 1 unique video IDs from input source.
+2025-06-14 14:15:16,437 - INFO - [process_videos] - Starting processing for 1 videos.
+2025-06-14 14:15:26,220 - INFO - [get_video_title] - Successfully fetched title for video ID qDOrZw6Pryo: 'How to Start Shopify E-Commerce in Pakistan with Zero Investment 2025 | Step-by-Step Guide'
+2025-06-14 14:15:26,227 - INFO - [process_videos] - Processing video ID: qDOrZw6Pryo
+2025-06-14 14:15:28,437 - ERROR - [process_videos] - Failed to fetch transcript for qDOrZw6Pryo. Skipping.
+2025-06-14 14:15:28,452 - INFO - [<module>] - Script completed successfully in 12.02 seconds.
+2025-06-14 14:16:45,094 - INFO - [<module>] - Using Gemini model: gemini-1.5-flash-latest via Base URL: https://generativelanguage.googleapis.com/v1beta
+2025-06-14 14:16:46,031 - INFO - [__init__] - Rate limiter initialized: RPM=60, QPD=1500
+2025-06-14 14:16:46,044 - INFO - [parse_input_source] - Parsed 1 unique video IDs from input source.
+2025-06-14 14:16:46,045 - INFO - [process_videos] - Starting processing for 1 videos.
+2025-06-14 14:16:54,426 - INFO - [get_video_title] - Successfully fetched title for video ID qDOrZw6Pryo: 'How to Start Shopify E-Commerce in Pakistan with Zero Investment 2025 | Step-by-Step Guide'
+2025-06-14 14:16:54,427 - INFO - [process_videos] - Processing video ID: qDOrZw6Pryo
+2025-06-14 14:16:56,522 - INFO - [generate_content_ideas] - Generating content ideas from transcript.
+2025-06-14 14:17:07,273 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 14:17:07,337 - INFO - [generate_content_ideas] - Successfully generated 3 raw content ideas.
+2025-06-14 14:17:13,192 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 14:17:13,196 - INFO - [generate_specific_content_pieces] - Successfully created and validated Reel '2025 mein online business kaise start karen?' (ID: qDOrZw6Pryo_001)
+2025-06-14 14:17:13,196 - INFO - [generate_specific_content_pieces] - Processing idea 2/3: 'Shopify vs. Local E-commerce vs. Dropshipping' (type: image_carousel)
+2025-06-14 14:17:18,366 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 14:17:18,373 - ERROR - [generate_specific_content_pieces] - Pydantic validation failed for qDOrZw6Pryo_002: 1 validation error for ImageCarousel
+caption
+  String should have at most 300 characters [type=string_too_long, input_value='Apnay e-commerce busines...nt Language: roman urdu', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.11/v/string_too_long
+2025-06-14 14:17:20,586 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 14:17:20,589 - INFO - [generate_specific_content_pieces] - Successfully created and validated Tweet 'TikTok_ads_ka_ise_fayda_uthen' (ID: qDOrZw6Pryo_003)
+2025-06-14 14:17:20,589 - INFO - [generate_specific_content_pieces] - Completed generation of 2 pieces for video qDOrZw6Pryo.
+2025-06-14 14:17:20,592 - INFO - [save_generated_content_to_csv] - Saved 2 content pieces for video 'How to Start Shopify E-Commerce in Pakistan with Zero Investment 2025 | Step-by-Step Guide' to output\generated_content.csv
+2025-06-14 14:17:20,608 - INFO - [<module>] - Script completed successfully in 34.57 seconds.
+2025-06-14 14:20:47,833 - INFO - [<module>] - Using Gemini model: gemini-1.5-flash-latest via Base URL: https://generativelanguage.googleapis.com/v1beta
+2025-06-14 14:20:48,697 - INFO - [__init__] - Rate limiter initialized: RPM=60, QPD=1500
+2025-06-14 14:20:48,711 - INFO - [parse_input_source] - Parsed 1 unique video IDs from input source.
+2025-06-14 14:20:48,712 - INFO - [process_videos] - Starting processing for 1 videos.
+2025-06-14 14:20:59,231 - INFO - [get_video_title] - Successfully fetched title for video ID qDOrZw6Pryo: 'How to Start Shopify E-Commerce in Pakistan with Zero Investment 2025 | Step-by-Step Guide'
+2025-06-14 14:20:59,233 - INFO - [process_videos] - Processing video ID: qDOrZw6Pryo
+2025-06-14 14:21:03,556 - INFO - [generate_content_ideas] - Generating content ideas from transcript.
+2025-06-14 14:21:08,630 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 14:21:08,633 - INFO - [generate_content_ideas] - Successfully generated 3 raw content ideas.
+2025-06-14 14:21:08,634 - INFO - [generate_specific_content_pieces] - Processing idea 1/3: '2025 میں بغیر سرمایہ کاری کے آن لائن بزنس کیسے شروع کریں؟' (type: reel)
+2025-06-14 14:21:13,637 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 14:21:13,645 - INFO - [generate_specific_content_pieces] - Successfully created and validated Reel '2025 mein online business kaise start karen?' (ID: qDOrZw6Pryo_001)
+2025-06-14 14:21:13,645 - INFO - [generate_specific_content_pieces] - Processing idea 2/3: 'Shopfi, Local E-commerce، اور Dropshipping میں فرق سمجھیں' (type: image_carousel)
+2025-06-14 14:21:18,972 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 14:21:18,978 - INFO - [generate_specific_content_pieces] - Successfully created and validated Image_carousel 'Shopify, Local E-commerce، اور Dropshipping میں فرق سمجھیں' (ID: qDOrZw6Pryo_002)
+2025-06-14 14:21:18,978 - INFO - [generate_specific_content_pieces] - Processing idea 3/3: 'بغیر سرمایہ کاری کے آن لائن بزنس ممکن ہے؟' (type: tweet)
+2025-06-14 14:21:21,048 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 14:21:21,049 - INFO - [generate_specific_content_pieces] - Successfully created and validated Tweet 'tweet_123' (ID: qDOrZw6Pryo_003)
+2025-06-14 14:21:21,050 - INFO - [generate_specific_content_pieces] - Completed generation of 3 pieces for video qDOrZw6Pryo.
+2025-06-14 14:21:21,052 - INFO - [save_generated_content_to_csv] - Saved 3 content pieces for video 'How to Start Shopify E-Commerce in Pakistan with Zero Investment 2025 | Step-by-Step Guide' to output\generated_content.csv
+2025-06-14 14:21:21,064 - INFO - [<module>] - Script completed successfully in 32.35 seconds.
+2025-06-14 14:34:52,988 - INFO - [<module>] - Using Gemini model: gemini-1.5-flash-latest via Base URL: https://generativelanguage.googleapis.com/v1beta
+2025-06-14 14:34:53,777 - INFO - [__init__] - Rate limiter initialized: RPM=60, QPD=1500
+2025-06-14 14:34:53,790 - INFO - [parse_input_source] - Parsed 1 unique video IDs from input source.
+2025-06-14 14:34:53,790 - INFO - [process_videos] - Starting processing for 1 videos.
+2025-06-14 14:35:03,607 - INFO - [get_video_title] - Successfully fetched title for video ID qDOrZw6Pryo: 'How to Start Shopify E-Commerce in Pakistan with Zero Investment 2025 | Step-by-Step Guide'
+2025-06-14 14:35:03,610 - INFO - [process_videos] - Processing video ID: qDOrZw6Pryo
+2025-06-14 14:35:07,378 - INFO - [generate_content_ideas] - Generating content ideas from transcript.
+2025-06-14 14:35:13,280 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 14:35:13,283 - INFO - [generate_content_ideas] - Successfully generated 3 raw content ideas.
+2025-06-14 14:35:13,283 - INFO - [generate_specific_content_pieces] - Processing idea 1/3: '2025 میں بغیر سرمایہ کاری کے اپنا آن لائن بزنس کیسے شروع کریں؟' (type: reel)
+2025-06-14 14:35:20,040 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 14:35:20,047 - ERROR - [generate_specific_content_pieces] - Pydantic validation failed for qDOrZw6Pryo_001: 1 validation error for Reel
+caption
+  String should have at most 300 characters [type=string_too_long, input_value='E-commerce 2025 mein kaa...du but in roman script)', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.11/v/string_too_long
+2025-06-14 14:35:20,047 - INFO - [generate_specific_content_pieces] - Processing idea 2/3: 'Shopify vs. WordPress: کون سا پلیٹ فارم بہتر ہے؟' (type: image_carousel)
+2025-06-14 14:35:24,518 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 14:35:24,524 - INFO - [generate_specific_content_pieces] - Successfully created and validated Image_carousel 'Shopify vs WordPress: Kon sa platform behtar hai?' (ID: qDOrZw6Pryo_002)
+2025-06-14 14:35:24,524 - INFO - [generate_specific_content_pieces] - Processing idea 3/3: 'دکان بنانے کے لیے کتنی رقم درکار ہے؟' (type: tweet)
+2025-06-14 14:35:26,978 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 14:35:26,984 - INFO - [generate_specific_content_pieces] - Successfully created and validated Tweet 'tweet_on_ecom_in_pakistan' (ID: qDOrZw6Pryo_003)
+2025-06-14 14:35:26,984 - INFO - [generate_specific_content_pieces] - Completed generation of 2 pieces for video qDOrZw6Pryo.
+2025-06-14 14:35:26,986 - INFO - [save_generated_content_to_csv] - Saved 2 content pieces for video 'How to Start Shopify E-Commerce in Pakistan with Zero Investment 2025 | Step-by-Step Guide' to output\generated_content.csv
+2025-06-14 14:35:26,999 - INFO - [<module>] - Script completed successfully in 33.21 seconds.
+2025-06-14 14:36:13,154 - INFO - [<module>] - Using Gemini model: gemini-1.5-flash-latest via Base URL: https://generativelanguage.googleapis.com/v1beta
+2025-06-14 14:36:13,939 - INFO - [__init__] - Rate limiter initialized: RPM=60, QPD=1500
+2025-06-14 14:36:13,955 - INFO - [process_videos] - Starting processing for 1 videos.
+2025-06-14 14:36:29,515 - INFO - [generate_content_ideas] - Generating content ideas from transcript.
+2025-06-14 14:36:35,039 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 14:36:35,045 - ERROR - [generate_content_ideas] - LLM response for idea generation is invalid: {'transcriptAnalysis': {'mainTopic': 'Starting an e-commerce business in 2025 without investment', 'keyPoints': ["E-commerce business can't be started without any investment", 'Shopify is a platform to build an online store, not the only option', 'Local e-commerce refers to selling online within Pakistan', 'Dropshipping involves selling products without owning them, recommended internationally', 'GoLogin browser helps manage multiple social media accounts to avoid bans', 'To start a sustainable e-commerce business, 3-5 Lakh PKR is needed', 'Success requires choosing a good product and focusing on marketing', 'Returns are a major issue, effective strategies are needed to mitigate losses', 'Learning through experience is crucial; starting is more important than planning', "E-commerce is not dead, it's still a viable option despite saturation", 'Future videos will demonstrate practical aspects of e-commerce'], 'speakerOpinions': ['Starting an e-commerce business without any investment is unrealistic', 'Dropshipping is not recommended in Pakistan due to TikTok ad account issues', 'GoLogin browser is a useful tool for managing multiple accounts', '3-5 Lakh PKR is a realistic investment for a sustainable e-commerce business', 'Returns are a significant challenge in e-commerce', 'Practical experience is essential for learning e-commerce', 'E-commerce is not dead despite claims of saturation'], 'suggestedIdeas': ['Create a detailed guide on starting an e-commerce business in Pakistan with a realistic budget', 'Develop a tutorial on using GoLogin browser for managing social media accounts', 'Produce a case study analyzing successful e-commerce businesses in Pakistan', 'Offer consulting services to help people start and manage their e-commerce businesses', 'Create a course on effective marketing strategies for e-commerce businesses', 'Develop a system to help mitigate returns in e-commerce', 'Create videos demonstrating the practical aspects of e-commerce, such as store creation, product sourcing, ad management, and delivery', 'Address the challenges of local couriers in Pakistan and provide solutions', 'Compare and contrast different e-commerce platforms (Shopify, WooCommerce, etc.)', 'Explore alternative business models like affiliate marketing or print-on-demand'], 'targetAudience': 'Individuals interested in starting an e-commerce business in Pakistan'}}
+2025-06-14 14:36:35,045 - WARNING - [process_videos] - No ideas generated for qDOrZw6Pryo.
+2025-06-14 14:36:35,053 - INFO - [<module>] - Script completed successfully in 21.10 seconds.
+2025-06-14 14:41:25,641 - CRITICAL - [<module>] - Critical unhandled error during script execution.
+Traceback (most recent call last):
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\repurpose.py", line 426, in <module>
+    video_ids = parse_input_source(args.input_source)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\repurpose.py", line 339, in parse_input_source
+    if item.strip(): video_ids.add(extract_video_id(item.strip()))
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\repurpose.py", line 171, in extract_video_id
+    if match: return match.group(1)
+                     ^^^^^^^^^^^^^^
+IndexError: no such group
+2025-06-14 14:44:29,568 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 14:46:49,962 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 14:46:54,876 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 14:46:54,887 - ERROR - [generate_specific_content_pieces] - Pydantic validation failed for qDOrZw6Pryo_001: 3 validation errors for Reel
+caption
+  String should have at most 300 characters [type=string_too_long, input_value='Target Audience: ecom en...2025business #noproblem', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.11/v/string_too_long
+hook
+  Field required [type=missing, input_value={'content_type': 'reel', ..._id': 'qDOrZw6Pryo_001'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+script_body
+  Field required [type=missing, input_value={'content_type': 'reel', ..._id': 'qDOrZw6Pryo_001'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+2025-06-14 14:46:58,163 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 14:46:58,175 - ERROR - [generate_specific_content_pieces] - Pydantic validation failed for qDOrZw6Pryo_002: 1 validation error for ImageCarousel
+slides
+  Field required [type=missing, input_value={'content_type': 'image_c..._id': 'qDOrZw6Pryo_002'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+2025-06-14 14:47:01,002 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 14:47:01,009 - ERROR - [generate_specific_content_pieces] - Pydantic validation failed for qDOrZw6Pryo_003: 1 validation error for Tweet
+tweet_text
+  Field required [type=missing, input_value={'content_type': 'tweet',..._id': 'qDOrZw6Pryo_003'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+2025-06-14 14:47:04,803 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 14:47:04,809 - ERROR - [call_gemini_api] - Error in API call: Expecting ',' delimiter: line 1 column 977 (char 976)
+Traceback (most recent call last):
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\repurpose.py", line 202, in call_gemini_api
+    return json.loads(content_str)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\saboor\AppData\Local\Programs\Python\Python311\Lib\json\__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\saboor\AppData\Local\Programs\Python\Python311\Lib\json\decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\saboor\AppData\Local\Programs\Python\Python311\Lib\json\decoder.py", line 353, in raw_decode
+    obj, end = self.scan_once(s, idx)
+               ^^^^^^^^^^^^^^^^^^^^^^
+json.decoder.JSONDecodeError: Expecting ',' delimiter: line 1 column 977 (char 976)
+2025-06-14 14:47:08,155 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 14:47:08,164 - ERROR - [generate_specific_content_pieces] - Pydantic validation failed for qDOrZw6Pryo_005: 1 validation error for ImageCarousel
+slides
+  Field required [type=missing, input_value={'content_type': 'image_c..._id': 'qDOrZw6Pryo_005'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+2025-06-14 14:51:52,708 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 14:51:58,044 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 14:52:02,034 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 14:52:02,044 - ERROR - [generate_specific_content_pieces] - Pydantic validation failed for qDOrZw6Pryo_002: 1 validation error for ImageCarousel
+slides
+  List should have at least 4 items after validation, not 3 [type=too_short, input_value=[{'slide_number': 1, 'ima...rvice,  zyada control'}], input_type=list]
+    For further information visit https://errors.pydantic.dev/2.11/v/too_short
+2025-06-14 14:52:04,462 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 14:57:00,968 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 14:57:06,052 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 14:57:09,554 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 14:57:12,170 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:00:49,791 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:00:55,679 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:00:59,960 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:01:03,092 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:02:38,738 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:02:43,031 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:02:47,177 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:02:49,885 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:04:26,357 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:04:30,644 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:04:34,995 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:04:38,183 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:09:29,266 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:09:34,020 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:09:37,258 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:09:39,962 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:09:44,115 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:09:48,325 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:09:51,320 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:24:36,739 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:24:42,402 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:24:47,302 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:24:50,451 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:24:54,708 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:24:58,439 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:25:02,056 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:25:19,787 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:25:23,615 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:25:27,829 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:25:31,041 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:25:33,386 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:25:38,436 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:25:57,744 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:26:02,810 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:26:07,851 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:26:11,854 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:26:18,890 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:26:23,060 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:26:26,155 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:26:57,536 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:27:10,881 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:27:12,862 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-14 15:27:12,866 - INFO - [_sleep_for_retry] - Retrying request to /chat/completions in 0.393253 seconds
+2025-06-14 15:27:15,126 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-14 15:27:15,130 - INFO - [_sleep_for_retry] - Retrying request to /chat/completions in 0.915726 seconds
+2025-06-14 15:27:18,046 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-14 15:27:18,051 - ERROR - [call_gemini_api] - Error in API call: Error code: 429 - [{'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-1.5-flash'}, 'quotaValue': '250000'}]}, {'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '41s'}]}}]
+Traceback (most recent call last):
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\repurpose.py", line 194, in call_gemini_api
+    response = client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\_utils\_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\resources\chat\completions\completions.py", line 925, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\_base_client.py", line 1242, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\_base_client.py", line 1037, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-1.5-flash'}, 'quotaValue': '250000'}]}, {'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '41s'}]}}]
+2025-06-14 15:27:20,044 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-14 15:27:20,048 - INFO - [_sleep_for_retry] - Retrying request to /chat/completions in 0.493805 seconds
+2025-06-14 15:27:22,525 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-14 15:27:22,530 - INFO - [_sleep_for_retry] - Retrying request to /chat/completions in 0.954882 seconds
+2025-06-14 15:27:25,518 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-14 15:27:25,523 - ERROR - [call_gemini_api] - Error in API call: Error code: 429 - [{'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-1.5-flash'}, 'quotaValue': '250000'}]}, {'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '34s'}]}}]
+Traceback (most recent call last):
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\repurpose.py", line 194, in call_gemini_api
+    response = client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\_utils\_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\resources\chat\completions\completions.py", line 925, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\_base_client.py", line 1242, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\_base_client.py", line 1037, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-1.5-flash'}, 'quotaValue': '250000'}]}, {'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '34s'}]}}]
+2025-06-14 15:27:27,416 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-14 15:27:27,421 - INFO - [_sleep_for_retry] - Retrying request to /chat/completions in 0.441283 seconds
+2025-06-14 15:27:29,831 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-14 15:27:29,835 - INFO - [_sleep_for_retry] - Retrying request to /chat/completions in 0.780160 seconds
+2025-06-14 15:27:32,755 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-14 15:27:32,756 - ERROR - [call_gemini_api] - Error in API call: Error code: 429 - [{'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-1.5-flash'}, 'quotaValue': '250000'}]}, {'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '27s'}]}}]
+Traceback (most recent call last):
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\repurpose.py", line 194, in call_gemini_api
+    response = client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\_utils\_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\resources\chat\completions\completions.py", line 925, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\_base_client.py", line 1242, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\_base_client.py", line 1037, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-1.5-flash'}, 'quotaValue': '250000'}]}, {'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '27s'}]}}]
+2025-06-14 15:27:43,378 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:27:52,439 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:27:54,501 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-14 15:27:54,513 - INFO - [_sleep_for_retry] - Retrying request to /chat/completions in 0.443368 seconds
+2025-06-14 15:35:54,745 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:35:58,677 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:36:01,683 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:36:04,136 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:36:07,761 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:36:10,420 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:36:12,688 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:36:29,504 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:36:34,053 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:36:38,045 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:36:40,131 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:36:44,339 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:36:47,256 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:36:49,118 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:37:09,721 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:37:15,361 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:37:19,419 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:37:23,522 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:37:28,445 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:37:32,382 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:37:35,241 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:38:02,836 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:38:14,054 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:38:16,071 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-14 15:38:16,075 - INFO - [_sleep_for_retry] - Retrying request to /chat/completions in 0.429329 seconds
+2025-06-14 15:38:18,490 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-14 15:38:18,494 - INFO - [_sleep_for_retry] - Retrying request to /chat/completions in 0.874825 seconds
+2025-06-14 15:38:21,326 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-14 15:38:21,331 - ERROR - [call_gemini_api] - Error in API call: Error code: 429 - [{'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'model': 'gemini-1.5-flash', 'location': 'global'}, 'quotaValue': '250000'}]}, {'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '38s'}]}}]
+Traceback (most recent call last):
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\repurpose.py", line 194, in call_gemini_api
+    response = client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\_utils\_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\resources\chat\completions\completions.py", line 925, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\_base_client.py", line 1242, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\_base_client.py", line 1037, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'model': 'gemini-1.5-flash', 'location': 'global'}, 'quotaValue': '250000'}]}, {'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '38s'}]}}]
+2025-06-14 15:38:23,310 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-14 15:38:23,315 - INFO - [_sleep_for_retry] - Retrying request to /chat/completions in 0.467915 seconds
+2025-06-14 15:38:25,772 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-14 15:38:25,775 - INFO - [_sleep_for_retry] - Retrying request to /chat/completions in 0.826565 seconds
+2025-06-14 15:38:28,601 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-14 15:38:28,604 - ERROR - [call_gemini_api] - Error in API call: Error code: 429 - [{'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-1.5-flash'}, 'quotaValue': '250000'}]}, {'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '31s'}]}}]
+Traceback (most recent call last):
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\repurpose.py", line 194, in call_gemini_api
+    response = client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\_utils\_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\resources\chat\completions\completions.py", line 925, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\_base_client.py", line 1242, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\_base_client.py", line 1037, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-1.5-flash'}, 'quotaValue': '250000'}]}, {'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '31s'}]}}]
+2025-06-14 15:38:30,617 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-14 15:38:30,621 - INFO - [_sleep_for_retry] - Retrying request to /chat/completions in 0.496695 seconds
+2025-06-14 15:38:41,789 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:38:51,521 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:38:53,515 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-14 15:38:53,521 - INFO - [_sleep_for_retry] - Retrying request to /chat/completions in 0.391209 seconds
+2025-06-14 15:38:55,952 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-14 15:38:55,956 - INFO - [_sleep_for_retry] - Retrying request to /chat/completions in 0.905955 seconds
+2025-06-14 15:38:58,860 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-14 15:38:58,864 - ERROR - [call_gemini_api] - Error in API call: Error code: 429 - [{'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-1.5-flash'}, 'quotaValue': '250000'}]}, {'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '0s'}]}}]
+Traceback (most recent call last):
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\repurpose.py", line 194, in call_gemini_api
+    response = client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\_utils\_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\resources\chat\completions\completions.py", line 925, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\_base_client.py", line 1242, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\_base_client.py", line 1037, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-1.5-flash'}, 'quotaValue': '250000'}]}, {'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '0s'}]}}]
+2025-06-14 15:39:18,574 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:39:24,415 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:39:28,683 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:39:31,278 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:39:36,472 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:39:40,231 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:39:42,594 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:40:00,939 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:40:05,050 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:40:08,563 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:40:11,435 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:40:15,729 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:40:19,226 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:40:22,184 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:40:39,289 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:40:43,595 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:40:47,001 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:40:49,147 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:40:53,621 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:40:56,741 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:40:59,389 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:41:18,741 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:41:24,696 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:41:28,008 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:41:32,327 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:41:38,142 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:41:41,444 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:41:43,928 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:42:01,078 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:42:06,570 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:42:10,302 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:42:12,810 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:42:16,740 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:42:20,292 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:42:22,884 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:42:51,342 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:42:56,419 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:43:00,892 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:43:04,550 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:43:21,579 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:43:24,907 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:43:28,035 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:43:30,095 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:43:32,483 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:43:50,792 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:44:08,677 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:44:12,430 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:44:15,983 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:44:18,847 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:44:25,691 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:44:29,785 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:44:32,648 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:44:51,266 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:44:56,529 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:45:01,892 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:45:05,901 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:45:11,132 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:45:15,549 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:45:19,532 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:45:46,409 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:45:48,692 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-14 15:45:48,697 - INFO - [_sleep_for_retry] - Retrying request to /chat/completions in 0.396767 seconds
+2025-06-14 15:45:51,323 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-14 15:45:51,327 - INFO - [_sleep_for_retry] - Retrying request to /chat/completions in 0.978264 seconds
+2025-06-14 15:45:54,521 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-14 15:45:54,525 - ERROR - [call_gemini_api] - Error in API call: Error code: 429 - [{'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-1.5-flash'}, 'quotaValue': '250000'}]}, {'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '5s'}]}}]
+Traceback (most recent call last):
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\repurpose.py", line 194, in call_gemini_api
+    response = client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\_utils\_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\resources\chat\completions\completions.py", line 925, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\_base_client.py", line 1242, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\_base_client.py", line 1037, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-1.5-flash'}, 'quotaValue': '250000'}]}, {'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '5s'}]}}]
+2025-06-14 15:45:56,870 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-14 15:45:56,875 - INFO - [_sleep_for_retry] - Retrying request to /chat/completions in 0.451396 seconds
+2025-06-14 15:45:59,567 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-14 15:45:59,572 - INFO - [_sleep_for_retry] - Retrying request to /chat/completions in 0.874430 seconds
+2025-06-14 15:46:02,960 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-14 15:46:02,964 - ERROR - [call_gemini_api] - Error in API call: Error code: 429 - [{'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-1.5-flash'}, 'quotaValue': '250000'}]}, {'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '56s'}]}}]
+Traceback (most recent call last):
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\repurpose.py", line 194, in call_gemini_api
+    response = client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\_utils\_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\resources\chat\completions\completions.py", line 925, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\_base_client.py", line 1242, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\_base_client.py", line 1037, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-1.5-flash'}, 'quotaValue': '250000'}]}, {'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '56s'}]}}]
+2025-06-14 15:46:05,196 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-14 15:46:05,200 - INFO - [_sleep_for_retry] - Retrying request to /chat/completions in 0.491491 seconds
+2025-06-14 15:46:07,882 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-14 15:46:07,887 - INFO - [_sleep_for_retry] - Retrying request to /chat/completions in 0.794946 seconds
+2025-06-14 15:46:10,976 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-14 15:46:10,977 - ERROR - [call_gemini_api] - Error in API call: Error code: 429 - [{'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'model': 'gemini-1.5-flash', 'location': 'global'}, 'quotaValue': '250000'}]}, {'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '48s'}]}}]
+Traceback (most recent call last):
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\repurpose.py", line 194, in call_gemini_api
+    response = client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\_utils\_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\resources\chat\completions\completions.py", line 925, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\_base_client.py", line 1242, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\_base_client.py", line 1037, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'model': 'gemini-1.5-flash', 'location': 'global'}, 'quotaValue': '250000'}]}, {'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '48s'}]}}]
+2025-06-14 15:46:13,326 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-14 15:46:13,330 - INFO - [_sleep_for_retry] - Retrying request to /chat/completions in 0.412996 seconds
+2025-06-14 15:46:16,001 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-14 15:46:16,002 - INFO - [_sleep_for_retry] - Retrying request to /chat/completions in 0.994184 seconds
+2025-06-14 15:46:19,250 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-14 15:46:19,253 - ERROR - [call_gemini_api] - Error in API call: Error code: 429 - [{'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-1.5-flash'}, 'quotaValue': '250000'}]}, {'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '40s'}]}}]
+Traceback (most recent call last):
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\repurpose.py", line 194, in call_gemini_api
+    response = client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\_utils\_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\resources\chat\completions\completions.py", line 925, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\_base_client.py", line 1242, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\_base_client.py", line 1037, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-1.5-flash'}, 'quotaValue': '250000'}]}, {'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '40s'}]}}]
+2025-06-14 15:46:21,486 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-14 15:46:21,490 - INFO - [_sleep_for_retry] - Retrying request to /chat/completions in 0.382862 seconds
+2025-06-14 15:46:24,091 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-14 15:46:24,096 - INFO - [_sleep_for_retry] - Retrying request to /chat/completions in 0.835930 seconds
+2025-06-14 15:46:27,129 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-14 15:46:27,134 - ERROR - [call_gemini_api] - Error in API call: Error code: 429 - [{'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-1.5-flash'}, 'quotaValue': '250000'}]}, {'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '32s'}]}}]
+Traceback (most recent call last):
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\repurpose.py", line 194, in call_gemini_api
+    response = client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\_utils\_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\resources\chat\completions\completions.py", line 925, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\_base_client.py", line 1242, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\_base_client.py", line 1037, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-1.5-flash'}, 'quotaValue': '250000'}]}, {'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '32s'}]}}]
+2025-06-14 15:46:29,384 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-14 15:46:29,388 - INFO - [_sleep_for_retry] - Retrying request to /chat/completions in 0.422203 seconds
+2025-06-14 15:46:36,982 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:46:56,838 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:47:00,170 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:47:03,559 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:47:06,001 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:47:10,147 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:47:13,901 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:47:16,770 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:47:39,885 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:47:50,029 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:47:58,154 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:48:06,048 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:48:14,154 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:55:03,385 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:55:07,010 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:55:10,972 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:55:13,411 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:55:17,399 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:55:21,703 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:55:41,738 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:55:46,823 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:55:51,350 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:55:54,101 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:56:01,831 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:56:08,300 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:56:10,921 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:56:33,358 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:56:38,563 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:56:44,358 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:56:48,002 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:56:53,820 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:56:58,859 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:57:02,829 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:57:24,576 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:57:29,690 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:57:35,170 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:57:39,355 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:57:45,544 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:57:50,112 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:57:55,567 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:58:19,504 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:58:24,857 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:58:29,967 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:58:33,123 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:58:38,946 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:58:44,064 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:58:46,938 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:59:08,408 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:59:14,122 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:59:18,527 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:59:21,134 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:59:25,372 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:59:29,849 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:59:33,578 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:59:53,410 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 15:59:59,820 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 16:00:06,723 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 16:00:10,392 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 16:01:15,404 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 16:01:34,917 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 16:01:43,779 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 16:01:51,217 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 16:02:01,352 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 16:02:12,392 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 16:02:18,551 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 16:03:04,582 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 16:03:39,128 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 16:04:08,616 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 16:04:27,103 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 16:04:39,626 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 16:04:41,482 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-14 16:04:41,487 - INFO - [_sleep_for_retry] - Retrying request to /chat/completions in 0.391827 seconds
+2025-06-14 16:04:43,680 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-14 16:04:43,683 - INFO - [_sleep_for_retry] - Retrying request to /chat/completions in 0.958628 seconds
+2025-06-14 16:04:46,485 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-14 16:04:46,489 - ERROR - [call_gemini_api] - Error in API call: Error code: 429 - [{'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-1.5-flash'}, 'quotaValue': '250000'}]}, {'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '13s'}]}}]
+Traceback (most recent call last):
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\repurpose.py", line 196, in call_gemini_api
+    response = client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\_utils\_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\resources\chat\completions\completions.py", line 925, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\_base_client.py", line 1242, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\_base_client.py", line 1037, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-1.5-flash'}, 'quotaValue': '250000'}]}, {'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '13s'}]}}]
+2025-06-14 16:04:48,302 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-14 16:04:48,306 - INFO - [_sleep_for_retry] - Retrying request to /chat/completions in 0.379527 seconds
+2025-06-14 16:04:50,495 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-14 16:04:50,500 - INFO - [_sleep_for_retry] - Retrying request to /chat/completions in 0.997713 seconds
+2025-06-14 16:04:53,324 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-14 16:04:53,328 - ERROR - [call_gemini_api] - Error in API call: Error code: 429 - [{'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'model': 'gemini-1.5-flash', 'location': 'global'}, 'quotaValue': '250000'}]}, {'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '6s'}]}}]
+Traceback (most recent call last):
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\repurpose.py", line 196, in call_gemini_api
+    response = client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\_utils\_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\resources\chat\completions\completions.py", line 925, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\_base_client.py", line 1242, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\_base_client.py", line 1037, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'model': 'gemini-1.5-flash', 'location': 'global'}, 'quotaValue': '250000'}]}, {'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '6s'}]}}]
+2025-06-14 16:04:55,213 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-14 16:04:55,219 - INFO - [_sleep_for_retry] - Retrying request to /chat/completions in 0.482502 seconds
+2025-06-14 16:04:57,560 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-14 16:04:57,565 - INFO - [_sleep_for_retry] - Retrying request to /chat/completions in 0.753035 seconds
+2025-06-14 16:05:00,142 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-14 16:05:00,149 - ERROR - [call_gemini_api] - Error in API call: Error code: 429 - [{'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'model': 'gemini-1.5-flash', 'location': 'global'}, 'quotaValue': '250000'}]}, {'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '59s'}]}}]
+Traceback (most recent call last):
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\repurpose.py", line 196, in call_gemini_api
+    response = client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\_utils\_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\resources\chat\completions\completions.py", line 925, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\_base_client.py", line 1242, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\_base_client.py", line 1037, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'model': 'gemini-1.5-flash', 'location': 'global'}, 'quotaValue': '250000'}]}, {'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '59s'}]}}]
+2025-06-14 16:05:13,836 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 16:05:31,901 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 16:05:54,037 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 16:05:58,101 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 16:06:02,718 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 16:06:04,687 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 16:06:07,744 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 16:06:11,206 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 16:06:35,666 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 16:06:40,960 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 16:06:45,226 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 16:06:47,761 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 16:06:52,300 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 16:06:59,841 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 16:07:23,060 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 16:07:28,390 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 16:07:33,212 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 16:07:35,715 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 16:07:35,727 - ERROR - [generate_specific_content_pieces] - Pydantic validation failed for Y0RidqqhpTA_003: 1 validation error for Tweet
+tweet_text
+  String should have at most 280 characters [type=string_too_long, input_value='Pakistan mein online bus...nline #DigitalMarketing', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.11/v/string_too_long
+2025-06-14 16:07:38,994 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 16:08:01,053 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 16:08:06,239 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 16:08:11,686 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 16:08:13,931 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 16:08:18,125 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 16:08:22,501 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 16:08:26,377 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 16:08:47,918 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 16:08:52,236 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 16:08:56,451 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 16:08:58,657 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 16:09:05,525 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 16:09:11,101 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 16:09:14,919 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 16:09:14,926 - ERROR - [generate_specific_content_pieces] - Pydantic validation failed for o0mysO3SRtQ_006: 1 validation error for Tweet
+tweet_text
+  String should have at most 280 characters [type=string_too_long, input_value='E-commerce mein kamyabi ...p #motivation #business', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.11/v/string_too_long
+2025-06-14 16:09:35,506 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 16:09:40,093 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 16:09:44,808 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 16:09:46,926 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 16:09:53,657 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 16:09:57,525 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 16:10:28,885 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 16:10:31,359 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-14 16:10:31,362 - INFO - [_sleep_for_retry] - Retrying request to /chat/completions in 0.377910 seconds
+2025-06-14 16:10:34,088 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-14 16:10:34,095 - INFO - [_sleep_for_retry] - Retrying request to /chat/completions in 0.881396 seconds
+2025-06-14 16:10:37,223 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-14 16:10:37,226 - ERROR - [call_gemini_api] - Error in API call: Error code: 429 - [{'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'model': 'gemini-1.5-flash', 'location': 'global'}, 'quotaValue': '250000'}]}, {'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '22s'}]}}]
+Traceback (most recent call last):
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\repurpose.py", line 196, in call_gemini_api
+    response = client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\_utils\_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\resources\chat\completions\completions.py", line 925, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\_base_client.py", line 1242, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\_base_client.py", line 1037, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'model': 'gemini-1.5-flash', 'location': 'global'}, 'quotaValue': '250000'}]}, {'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '22s'}]}}]
+2025-06-14 16:10:39,542 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-14 16:10:39,546 - INFO - [_sleep_for_retry] - Retrying request to /chat/completions in 0.433729 seconds
+2025-06-14 16:10:42,265 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-14 16:10:42,267 - INFO - [_sleep_for_retry] - Retrying request to /chat/completions in 0.962191 seconds
+2025-06-14 16:10:45,686 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-14 16:10:45,688 - ERROR - [call_gemini_api] - Error in API call: Error code: 429 - [{'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'model': 'gemini-1.5-flash', 'location': 'global'}, 'quotaValue': '250000'}]}, {'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '14s'}]}}]
+Traceback (most recent call last):
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\repurpose.py", line 196, in call_gemini_api
+    response = client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\_utils\_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\resources\chat\completions\completions.py", line 925, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\_base_client.py", line 1242, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\_base_client.py", line 1037, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'model': 'gemini-1.5-flash', 'location': 'global'}, 'quotaValue': '250000'}]}, {'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '14s'}]}}]
+2025-06-14 16:10:47,994 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-14 16:10:47,995 - INFO - [_sleep_for_retry] - Retrying request to /chat/completions in 0.461668 seconds
+2025-06-14 16:10:50,756 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-14 16:10:50,760 - INFO - [_sleep_for_retry] - Retrying request to /chat/completions in 0.897058 seconds
+2025-06-14 16:10:53,983 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-14 16:10:53,986 - ERROR - [call_gemini_api] - Error in API call: Error code: 429 - [{'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-1.5-flash'}, 'quotaValue': '250000'}]}, {'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '5s'}]}}]
+Traceback (most recent call last):
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\repurpose.py", line 196, in call_gemini_api
+    response = client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\_utils\_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\resources\chat\completions\completions.py", line 925, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\_base_client.py", line 1242, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\_base_client.py", line 1037, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-1.5-flash'}, 'quotaValue': '250000'}]}, {'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '5s'}]}}]
+2025-06-14 16:10:56,218 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-14 16:10:56,223 - INFO - [_sleep_for_retry] - Retrying request to /chat/completions in 0.430131 seconds
+2025-06-14 16:11:09,052 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 16:11:11,382 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-14 16:11:11,390 - INFO - [_sleep_for_retry] - Retrying request to /chat/completions in 0.451231 seconds
+2025-06-14 16:11:14,230 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-14 16:11:14,235 - INFO - [_sleep_for_retry] - Retrying request to /chat/completions in 0.909328 seconds
+2025-06-14 16:11:17,441 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-14 16:11:17,444 - ERROR - [call_gemini_api] - Error in API call: Error code: 429 - [{'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-1.5-flash'}, 'quotaValue': '250000'}]}, {'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '42s'}]}}]
+Traceback (most recent call last):
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\repurpose.py", line 196, in call_gemini_api
+    response = client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\_utils\_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\resources\chat\completions\completions.py", line 925, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\_base_client.py", line 1242, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\_base_client.py", line 1037, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-1.5-flash'}, 'quotaValue': '250000'}]}, {'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '42s'}]}}]
+2025-06-14 16:11:19,683 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-14 16:11:19,690 - INFO - [_sleep_for_retry] - Retrying request to /chat/completions in 0.393722 seconds
+2025-06-14 16:11:22,375 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-14 16:11:22,380 - INFO - [_sleep_for_retry] - Retrying request to /chat/completions in 0.835189 seconds
+2025-06-14 16:11:25,563 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-14 16:11:25,565 - ERROR - [call_gemini_api] - Error in API call: Error code: 429 - [{'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-1.5-flash'}, 'quotaValue': '250000'}]}, {'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '34s'}]}}]
+Traceback (most recent call last):
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\repurpose.py", line 196, in call_gemini_api
+    response = client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\_utils\_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\resources\chat\completions\completions.py", line 925, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\_base_client.py", line 1242, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Saboor Hassan\Documents\Code\repurpose-api\.venv\Lib\site-packages\openai\_base_client.py", line 1037, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - [{'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-1.5-flash'}, 'quotaValue': '250000'}]}, {'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '34s'}]}}]
+2025-06-14 16:11:46,744 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 16:11:51,389 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 16:11:55,841 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 16:11:58,638 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 16:12:02,756 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 16:12:07,539 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-06-14 16:12:10,172 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-08-07 14:43:22,375 - ERROR - [transcribe_video] - Unexpected error in /transcribe/ for dQw4w9WgXcQ: type object 'YouTubeTranscriptApi' has no attribute 'get_transcript'
+Traceback (most recent call last):
+  File "D:\Saboor-Hassan\Documents\Code\repurpose-api\main.py", line 167, in transcribe_video
+    title=video_title,
+    
+AttributeError: type object 'YouTubeTranscriptApi' has no attribute 'get_transcript'
+2025-08-07 14:53:21,970 - ERROR - [transcribe_video] - Unexpected error in /transcribe/ for dQw4w9WgXcQ: type object 'YouTubeTranscriptApi' has no attribute 'get_transcript'
+Traceback (most recent call last):
+  File "D:\Saboor-Hassan\Documents\Code\repurpose-api\main.py", line 167, in transcribe_video
+    title=video_title,
+    
+AttributeError: type object 'YouTubeTranscriptApi' has no attribute 'get_transcript'
+2025-08-07 14:56:44,064 - ERROR - [transcribe_video] - Unexpected error in /transcribe/ for dQw4w9WgXcQ: type object 'YouTubeTranscriptApi' has no attribute 'get_transcript'
+Traceback (most recent call last):
+  File "D:\Saboor-Hassan\Documents\Code\repurpose-api\main.py", line 167, in transcribe_video
+    status_code=500,
+    
+AttributeError: type object 'YouTubeTranscriptApi' has no attribute 'get_transcript'
+2025-08-07 14:56:53,831 - ERROR - [transcribe_video] - Unexpected error in /transcribe/ for dQw4w9WgXcQ: type object 'YouTubeTranscriptApi' has no attribute 'get_transcript'
+Traceback (most recent call last):
+  File "D:\Saboor-Hassan\Documents\Code\repurpose-api\main.py", line 167, in transcribe_video
+    status_code=500,
+    
+AttributeError: type object 'YouTubeTranscriptApi' has no attribute 'get_transcript'
+2025-08-07 14:57:57,004 - ERROR - [transcribe_video] - Unexpected error in /transcribe/ for dQw4w9WgXcQ: type object 'YouTubeTranscriptApi' has no attribute 'get_transcript'
+Traceback (most recent call last):
+  File "D:\Saboor-Hassan\Documents\Code\repurpose-api\main.py", line 167, in transcribe_video
+    status_code=500,
+    
+AttributeError: type object 'YouTubeTranscriptApi' has no attribute 'get_transcript'
+2025-08-07 15:02:08,218 - ERROR - [transcribe_video] - Unexpected error in /transcribe/ for dQw4w9WgXcQ: type object 'YouTubeTranscriptApi' has no attribute 'get_transcript'
+Traceback (most recent call last):
+  File "D:\Saboor-Hassan\Documents\Code\repurpose-api\main.py", line 167, in transcribe_video
+    status_code=500,
+    
+AttributeError: type object 'YouTubeTranscriptApi' has no attribute 'get_transcript'
+2025-08-07 15:05:54,051 - ERROR - [transcribe_video] - Unexpected error in /transcribe/ for dQw4w9WgXcQ: type object 'YouTubeTranscriptApi' has no attribute 'get_transcript'
+Traceback (most recent call last):
+  File "D:\Saboor-Hassan\Documents\Code\repurpose-api\main.py", line 167, in transcribe_video
+    title=video_title,
+    
+AttributeError: type object 'YouTubeTranscriptApi' has no attribute 'get_transcript'
+2025-08-07 15:12:20,650 - ERROR - [transcribe_video] - Unexpected error in /transcribe/ for dQw4w9WgXcQ: type object 'YouTubeTranscriptApi' has no attribute 'get_transcript'
+Traceback (most recent call last):
+  File "D:\Saboor-Hassan\Documents\Code\repurpose-api\main.py", line 167, in transcribe_video
+    youtube_video_id=youtube_id_from_request,
+    
+AttributeError: type object 'YouTubeTranscriptApi' has no attribute 'get_transcript'
+2025-09-04 07:05:18,296 - ERROR - [transcribe_video] - Failed to fetch transcript: type object 'YouTubeTranscriptApi' has no attribute 'get_transcript'
+2025-09-04 07:05:27,130 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 07:05:52,656 - ERROR - [transcribe_video] - Failed to fetch transcript: type object 'YouTubeTranscriptApi' has no attribute 'get_transcript'
+2025-09-04 07:05:56,456 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 07:11:28,176 - INFO - [process_video] - Attempting to parse stored repurposed_text for video 7Un6mV2YQ54 (DB ID: 6) using robust parser.
+2025-09-04 07:12:00,135 - INFO - [process_video] - Attempting to parse stored repurposed_text for video 7Un6mV2YQ54 (DB ID: 6) using robust parser.
+2025-09-04 07:13:43,280 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 07:13:43,293 - ERROR - [generate_content] - Error in content generation: Expecting ',' delimiter: line 128 column 236 (char 10589)
+2025-09-04 07:13:43,298 - ERROR - [generate_content_ideas] - Invalid idea response: None
+2025-09-04 07:13:43,298 - ERROR - [process_video] - Failed to generate content ideas for video ID 7Un6mV2YQ54.
+2025-09-04 07:15:47,275 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 07:15:56,843 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 07:15:56,859 - ERROR - [generate_specific_content_pieces] - Pydantic validation failed for 7Un6mV2YQ54_001: 1 validation error for Reel
+caption
+  String should have at most 300 characters [type=string_too_long, input_value='Jis tarah ek sourdough s...iye follow karein! 💡', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.11/v/string_too_long
+2025-09-04 07:16:05,438 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 07:16:05,449 - ERROR - [generate_specific_content_pieces] - Pydantic validation failed for 7Un6mV2YQ54_002: 1 validation error for ImageCarousel
+caption
+  String should have at most 300 characters [type=string_too_long, input_value='Sourdough baking mein ha...yabi ki kunji hai! 🔑', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.11/v/string_too_long
+2025-09-04 07:16:12,101 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 07:16:25,873 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 07:16:25,890 - ERROR - [generate_specific_content_pieces] - Pydantic validation failed for 7Un6mV2YQ54_004: 1 validation error for Reel
+caption
+  String should have at most 300 characters [type=string_too_long, input_value="Sourdough mein 'folding'...aur flat' na lage. 📈", input_type=str]
+    For further information visit https://errors.pydantic.dev/2.11/v/string_too_long
+2025-09-04 07:16:36,565 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 07:16:36,578 - ERROR - [generate_specific_content_pieces] - Pydantic validation failed for 7Un6mV2YQ54_005: 1 validation error for ImageCarousel
+caption
+  String should have at most 300 characters [type=string_too_long, input_value="Aapka e-commerce busines... ke liye follow karein!", input_type=str]
+    For further information visit https://errors.pydantic.dev/2.11/v/string_too_long
+2025-09-04 07:16:40,258 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 07:19:20,639 - INFO - [process_video] - Attempting to parse stored repurposed_text for video 7Un6mV2YQ54 (DB ID: 6) using robust parser.
+2025-09-04 07:19:27,732 - INFO - [process_video] - Attempting to parse stored repurposed_text for video 7Un6mV2YQ54 (DB ID: 6) using robust parser.
+2025-09-04 07:20:04,649 - INFO - [process_video] - Force regenerating content for video ID 7Un6mV2YQ54 (DB ID: 6).
+2025-09-04 07:20:32,177 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 07:20:41,225 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 07:20:48,225 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 07:21:02,213 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 07:21:12,112 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 07:21:23,046 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 07:21:29,617 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 07:21:41,498 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 07:21:44,632 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 07:21:49,530 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 07:21:53,788 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 07:22:00,664 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 07:27:33,613 - INFO - [process_video] - Attempting to parse stored repurposed_text for video 7Un6mV2YQ54 (DB ID: 6) using robust parser.
+2025-09-04 07:33:08,791 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 08:20:16,886 - INFO - [process_video] - Force regenerating content for video ID 7Un6mV2YQ54 (DB ID: 6).
+2025-09-04 08:20:43,567 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 503 Service Unavailable"
+2025-09-04 08:20:43,568 - INFO - [_sleep_for_retry] - Retrying request to /chat/completions in 0.381243 seconds
+2025-09-04 08:21:15,985 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 08:21:25,813 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 08:21:37,811 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 08:21:45,635 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 08:21:45,649 - ERROR - [generate_specific_content_pieces] - Unable to fix validation errors for 7Un6mV2YQ54_001: 1 validation error for Reel
+caption
+  String should have at most 300 characters [type=string_too_long, input_value='Sourdough banana mushkil...omTips #ShopifyPakistan', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.11/v/string_too_long
+2025-09-04 08:21:57,173 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 08:22:18,367 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 08:22:33,192 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 08:22:47,400 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 08:22:50,799 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 08:22:53,572 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 08:22:58,133 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 08:24:02,722 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 08:42:33,948 - ERROR - [process_video] - Failed to fetch transcript: 
+Could not retrieve a transcript for the video https://www.youtube.com/watch?v=EFAT6br0otM! This is most likely caused by:
+
+Subtitles are disabled for this video
+
+If you are sure that the described cause is not responsible for this error and that a transcript should be retrievable, please create an issue at https://github.com/jdepoix/youtube-transcript-api/issues. Please add which version of youtube_transcript_api you are using and provide the information needed to replicate the error. Also make sure that there are no open issues which already describe your problem!
+2025-09-04 08:42:37,091 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 08:43:05,785 - INFO - [process_video] - Force regenerating content for video ID EFAT6br0otM (DB ID: 7).
+2025-09-04 08:43:13,177 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 08:44:50,440 - INFO - [process_video] - Force regenerating content for video ID lo4bA4p3MBQ (DB ID: 8).
+2025-09-04 08:45:19,983 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 08:45:32,334 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 08:45:39,758 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 08:45:46,974 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 08:46:01,948 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 08:46:08,486 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 08:46:21,848 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 08:46:28,408 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 08:46:36,148 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 08:46:36,165 - ERROR - [generate_specific_content_pieces] - Unable to fix validation errors for lo4bA4p3MBQ_004: 1 validation error for Reel
+caption
+  String should have at most 300 characters [type=string_too_long, input_value='Couch Console ki kahani:...ROI-boosting tips. 🤔', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.11/v/string_too_long
+2025-09-04 08:46:46,967 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 08:46:52,774 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 08:47:03,687 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 08:47:11,470 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 08:47:24,655 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 08:47:33,085 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 08:47:44,129 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 08:47:55,096 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 08:48:03,904 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 08:48:12,537 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 08:48:26,193 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 08:48:41,138 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 09:10:20,863 - ERROR - [transcribe_video] - Failed to fetch transcript: 
+Could not retrieve a transcript for the video https://www.youtube.com/watch?v=XzVbWXn2t24! This is most likely caused by:
+
+No transcripts were found for any of the requested language codes: ('en',)
+
+For this video (XzVbWXn2t24) transcripts are available in the following languages:
+
+(MANUALLY CREATED)
+None
+
+(GENERATED)
+ - hi ("Hindi (auto-generated)")
+
+(TRANSLATION LANGUAGES)
+None
+
+If you are sure that the described cause is not responsible for this error and that a transcript should be retrievable, please create an issue at https://github.com/jdepoix/youtube-transcript-api/issues. Please add which version of youtube_transcript_api you are using and provide the information needed to replicate the error. Also make sure that there are no open issues which already describe your problem!
+2025-09-04 10:55:08,935 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 10:55:24,899 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 10:55:37,810 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 10:55:43,148 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 10:55:55,304 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 10:56:06,034 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 10:56:17,247 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 10:56:30,681 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 10:56:37,158 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 10:56:49,997 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 10:56:53,010 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-09-04 11:45:44,817 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"

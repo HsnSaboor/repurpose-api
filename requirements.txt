@@ -1,0 +1,33 @@
+# Core Dependencies
+fastapi
+uvicorn
+python-dotenv
+pydantic
+pydantic-settings
+
+# Database
+sqlalchemy
+sqlmodel
+psutil
+alembic
+aiosqlite
+
+# Monitoring and Instrumentation
+prometheus-client
+prometheus-fastapi-instrumentator
+psutil  # Duplicate but kept for clarity
+
+# API Clients
+openai>=1.0.0
+youtube-transcript-api
+youtube-search-python
+yt-dlp
+scrapetube
+youtube-comment-downloader
+
+# Utilities
+pandas
+rich
+# Testing
+pytest
+requests
