@@ -11,11 +11,12 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
-import { Upload, Play, Square, AlertCircle, CheckCircle, Youtube } from 'lucide-react';
-import { ProcessVideoResponse, processVideo, StylePreset, getStylePresets } from '@/lib/api';
+import { Upload, Play, Square, AlertCircle, CheckCircle, Youtube, Globe, Bot, Languages, Zap } from 'lucide-react';
+import { ProcessVideoResponse, processVideo, StylePreset, getStylePresets, transcribeVideoEnhanced, analyzeTranscripts, TranscriptMetadata } from '@/lib/api';
 import { processVideoWithStreaming } from '@/lib/database-service';
 import { useAppStore, useNotifications } from '@/lib/app-store';
 import AnimatedLoading from './animated-loading';
+import TranscriptStatusBadge from './transcript-status-badge';
 
 interface StreamingVideoProcessorProps {
   onContentGenerated: (content: ProcessVideoResponse) => void;
@@ -27,6 +28,12 @@ interface ProgressState {
   progress: number;
   isComplete: boolean;
   isError: boolean;
+  transcriptStatus?: {
+    type: 'analyzing' | 'found' | 'translating' | 'ready' | 'error';
+    metadata?: TranscriptMetadata;
+    source?: string;
+    confidence?: number;
+  };
 }
 
 export default function StreamingVideoProcessor({ onContentGenerated }: StreamingVideoProcessorProps) {
@@ -40,13 +47,52 @@ export default function StreamingVideoProcessor({ onContentGenerated }: Streamin
     progress: 0,
     isComplete: false,
     isError: false,
+    transcriptStatus: undefined,
   });
   const [streamedContent, setStreamedContent] = useState<ProcessVideoResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [transcriptPreview, setTranscriptPreview] = useState<{
+    available: boolean;
+    analysis?: any;
+    loading: boolean;
+  }>({ available: false, loading: false });
   
   const { addRecentVideo } = useAppStore();
   const { showSuccess, showError } = useNotifications();
   const cancelStreamingRef = useRef<(() => void) | null>(null);
+
+  // Preview transcript analysis when URL changes
+  useEffect(() => {
+    const checkTranscripts = async () => {
+      if (!videoUrl.trim()) {
+        setTranscriptPreview({ available: false, loading: false });
+        return;
+      }
+      
+      const videoId = getVideoIdFromUrl(videoUrl.trim());
+      if (!videoId) {
+        setTranscriptPreview({ available: false, loading: false });
+        return;
+      }
+      
+      setTranscriptPreview({ available: false, loading: true });
+      
+      try {
+        const analysis = await analyzeTranscripts(videoId);
+        setTranscriptPreview({
+          available: true,
+          analysis,
+          loading: false
+        });
+      } catch (error) {
+        setTranscriptPreview({ available: false, loading: false });
+      }
+    };
+    
+    // Debounce the analysis call
+    const timeoutId = setTimeout(checkTranscripts, 1000);
+    return () => clearTimeout(timeoutId);
+  }, [videoUrl]);
 
   // Load style presets on component mount
   useEffect(() => {
@@ -79,7 +125,8 @@ export default function StreamingVideoProcessor({ onContentGenerated }: Streamin
     const messages: Record<string, string> = {
       'starting': 'Initializing video processing...',
       'searching': 'Searching video from YouTube...',
-      'transcribing': 'Generating transcript...',
+      'transcribing': 'Analyzing available transcripts...',
+      'transcript_ready': 'English transcript ready for processing',
       'analyzing': 'Analyzing content for key themes...',
       'generating_ideas': 'Creating content ideas...',
       'creating_content': 'Generating final content pieces...',
@@ -88,6 +135,71 @@ export default function StreamingVideoProcessor({ onContentGenerated }: Streamin
       'error': 'An error occurred during processing',
     };
     return messages[status] || status;
+  };
+
+  const getTranscriptStatusInfo = (status: string, message?: string) => {
+    // Enhanced transcript status detection
+    if (status === 'transcribing' || message?.toLowerCase().includes('transcript')) {
+      if (message?.includes('manual English')) {
+        return {
+          type: 'found' as const,
+          source: 'Manual English',
+          confidence: 100
+        };
+      } else if (message?.includes('auto-generated English')) {
+        return {
+          type: 'found' as const,
+          source: 'Auto-generated English', 
+          confidence: 80
+        };
+      } else if (message?.includes('translating') || message?.includes('translated')) {
+        return {
+          type: 'translating' as const,
+          source: 'Translation in progress',
+          confidence: 70
+        };
+      } else if (message?.includes('ready')) {
+        return {
+          type: 'ready' as const,
+          source: 'English transcript ready',
+          confidence: 90
+        };
+      } else {
+        return {
+          type: 'analyzing' as const,
+          source: 'Analyzing transcripts',
+          confidence: 50
+        };
+      }
+    }
+    return undefined;
+  };
+
+  const getTranscriptIcon = (transcriptStatus?: ProgressState['transcriptStatus']) => {
+    if (!transcriptStatus) return null;
+    
+    switch (transcriptStatus.type) {
+      case 'analyzing':
+        return <Bot className="h-4 w-4 text-blue-500 animate-pulse" />;
+      case 'found':
+        return <CheckCircle className="h-4 w-4 text-green-500" />;
+      case 'translating':
+        return <Languages className="h-4 w-4 text-orange-500 animate-spin" />;
+      case 'ready':
+        return <Zap className="h-4 w-4 text-green-600" />;
+      case 'error':
+        return <AlertCircle className="h-4 w-4 text-red-500" />;
+      default:
+        return <Globe className="h-4 w-4 text-gray-500" />;
+    }
+  };
+
+  const getConfidenceColor = (confidence?: number) => {
+    if (!confidence) return 'text-gray-500';
+    if (confidence >= 90) return 'text-green-600';
+    if (confidence >= 70) return 'text-blue-600';
+    if (confidence >= 50) return 'text-orange-600';
+    return 'text-red-600';
   };
 
   const getProgressValue = (status: string): number => {
@@ -103,6 +215,59 @@ export default function StreamingVideoProcessor({ onContentGenerated }: Streamin
       'error': 0,
     };
     return progressMap[status] || 0;
+  };
+
+  const analyzeTranscriptsBefore = async (videoId: string) => {
+    try {
+      setProgressState(prev => ({
+        ...prev,
+        transcriptStatus: {
+          type: 'analyzing',
+          source: 'Analyzing available transcripts...',
+          confidence: 0
+        }
+      }));
+
+      const analysis = await analyzeTranscripts(videoId);
+      
+      // Update progress with transcript analysis results
+      const confidenceMap: Record<string, number> = {
+        'manual_english': 100,
+        'auto_english': 80,
+        'manual_translated': 70,
+        'auto_translated': 50
+      };
+      
+      const confidence = confidenceMap[analysis.recommended_approach] || 50;
+      const sourceMap: Record<string, string> = {
+        'manual_english': 'Manual English (Optimal)',
+        'auto_english': 'Auto-generated English (Good)',
+        'manual_translated': 'Manual + Translation (Medium)',
+        'auto_translated': 'Auto-generated + Translation (Basic)'
+      };
+      
+      setProgressState(prev => ({
+        ...prev,
+        transcriptStatus: {
+          type: 'found',
+          source: sourceMap[analysis.recommended_approach] || 'Available',
+          confidence
+        }
+      }));
+      
+      return analysis;
+    } catch (error) {
+      console.error('Transcript analysis failed:', error);
+      setProgressState(prev => ({
+        ...prev,
+        transcriptStatus: {
+          type: 'error',
+          source: 'Analysis failed',
+          confidence: 0
+        }
+      }));
+      return null;
+    }
   };
 
   const handleProcess = async () => {
@@ -126,9 +291,13 @@ export default function StreamingVideoProcessor({ onContentGenerated }: Streamin
       progress: 5,
       isComplete: false,
       isError: false,
+      transcriptStatus: undefined,
     });
 
     try {
+      // First, analyze available transcripts
+      await analyzeTranscriptsBefore(videoId);
+      
       // Start streaming process
       const cleanup = processVideoWithStreaming(
         videoId,
@@ -140,12 +309,17 @@ export default function StreamingVideoProcessor({ onContentGenerated }: Streamin
           const progress = progressData.progress || getProgressValue(progressData.status);
           const message = progressData.message || getProgressMessage(progressData.status);
           
+          // Detect and update transcript status
+          const transcriptStatus = getTranscriptStatusInfo(progressData.status, message) || 
+                                 progressState.transcriptStatus;
+          
           setProgressState({
             status: progressData.status,
             message,
             progress,
             isComplete: progressData.status === 'complete',
             isError: progressData.status === 'error',
+            transcriptStatus,
           });
 
           // If we received the final data
@@ -252,6 +426,63 @@ export default function StreamingVideoProcessor({ onContentGenerated }: Streamin
             </div>
           </div>
 
+          {/* Transcript Preview */}
+          {(transcriptPreview.available || transcriptPreview.loading) && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              transition={{ duration: 0.3 }}
+              className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg"
+            >
+              <div className="flex items-center gap-2 mb-2">
+                <Globe className="h-4 w-4 text-blue-600" />
+                <span className="text-sm font-medium text-blue-800 dark:text-blue-200">
+                  Transcript Analysis
+                </span>
+              </div>
+              
+              {transcriptPreview.loading ? (
+                <div className="flex items-center gap-2 text-sm text-blue-600">
+                  <AnimatedLoading size="sm" />
+                  Analyzing available transcripts...
+                </div>
+              ) : transcriptPreview.analysis ? (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-blue-700 dark:text-blue-300">
+                      Recommended approach: <strong>
+                        {transcriptPreview.analysis.recommended_approach.replace('_', ' ')}
+                      </strong>
+                    </span>
+                    <div className="flex items-center gap-1">
+                      {transcriptPreview.analysis.recommended_approach === 'manual_english' && (
+                        <CheckCircle className="h-4 w-4 text-green-500" />
+                      )}
+                      {transcriptPreview.analysis.recommended_approach === 'auto_english' && (
+                        <Bot className="h-4 w-4 text-blue-500" />
+                      )}
+                      {transcriptPreview.analysis.recommended_approach.includes('translated') && (
+                        <Languages className="h-4 w-4 text-orange-500" />
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className="text-xs text-blue-600 dark:text-blue-400">
+                    Available: {transcriptPreview.analysis.available_transcripts?.map(
+                      (t: any) => `${t.language} (${t.is_generated ? 'auto' : 'manual'})`
+                    ).join(', ')}
+                  </div>
+                  
+                  {transcriptPreview.analysis.processing_notes?.length > 0 && (
+                    <div className="text-xs text-blue-500 dark:text-blue-400">
+                      {transcriptPreview.analysis.processing_notes[0]}
+                    </div>
+                  )}
+                </div>
+              ) : null}
+            </motion.div>
+          )}
+
           {/* Processing Options */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
@@ -299,6 +530,7 @@ export default function StreamingVideoProcessor({ onContentGenerated }: Streamin
               <Separator />
               
               <div className="space-y-3">
+                {/* Main progress */}
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                     {progressState.message || getProgressMessage(progressState.status)}
@@ -312,6 +544,15 @@ export default function StreamingVideoProcessor({ onContentGenerated }: Streamin
                   value={progressState.progress} 
                   className="h-2"
                 />
+                
+                {/* Transcript Status Indicator */}
+                {progressState.transcriptStatus && (
+                  <TranscriptStatusBadge
+                    status={progressState.transcriptStatus.type}
+                    source={progressState.transcriptStatus.source}
+                    confidence={progressState.transcriptStatus.confidence}
+                  />
+                )}
                 
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">

@@ -10,11 +10,12 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { ProcessVideoResponse, ContentPiece, editContent, EditContentRequest } from '@/lib/api';
-import { Edit3, Copy, Download, Eye, History, Instagram, Twitter, FileImage, Sparkles, Save, X, ExternalLink, Youtube, Play } from 'lucide-react';
+import { Edit3, Copy, Download, Eye, History, Instagram, Twitter, FileImage, Sparkles, Save, X, ExternalLink, Youtube, Play, Globe } from 'lucide-react';
 import EditHistory from './edit-history';
 import { EditHistoryEntry } from '@/lib/edit-history-store';
 import ExportDialog from './export-dialog';
 import { useContentEditHistory } from '@/lib/edit-history-store';
+import TranscriptStatusBadge from './transcript-status-badge';
 
 interface ContentViewerProps {
   content: ProcessVideoResponse | null;
@@ -485,6 +486,18 @@ export default function ContentViewer({ content, onContentUpdated }: ContentView
                       {currentContent.status}
                     </Badge>
                   )}
+                </div>
+                
+                {/* Transcript Status Display */}
+                <div className="flex items-center gap-2">
+                  <Globe className="h-4 w-4 text-blue-500" />
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Transcript:</span>
+                  <TranscriptStatusBadge
+                    status="ready"
+                    source="English (Processed)"
+                    confidence={95}
+                    compact={true}
+                  />
                 </div>
                 
                 <div className="flex items-center gap-2">

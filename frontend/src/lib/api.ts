@@ -11,6 +11,47 @@ export interface CustomContentStyle {
   additional_instructions?: string;
 }
 
+// Enhanced transcript types
+export interface TranscriptPreferences {
+  prefer_manual?: boolean;
+  require_english?: boolean;
+  enable_translation?: boolean;
+  fallback_languages?: string[];
+  preserve_formatting?: boolean;
+}
+
+export interface TranscriptMetadata {
+  language_code: string;
+  language: string;
+  is_generated: boolean;
+  is_translated: boolean;
+  priority: string;
+  translation_source_language?: string;
+  confidence_score: number;
+  processing_notes: string[];
+}
+
+export interface EnhancedTranscriptResponse {
+  youtube_video_id: string;
+  title?: string;
+  transcript: string;
+  transcript_metadata?: TranscriptMetadata;
+  available_languages: string[];
+  status?: string;
+}
+
+export interface TranscriptAnalysisResponse {
+  youtube_video_id: string;
+  available_transcripts: Array<{
+    language_code: string;
+    language: string;
+    is_generated: boolean;
+    is_translatable: boolean;
+  }>;
+  recommended_approach: string;
+  processing_notes: string[];
+}
+
 export interface ProcessVideoRequest {
   video_id: string;
   force_regenerate?: boolean;
@@ -158,4 +199,65 @@ export async function transcribeVideo(videoId: string): Promise<{youtube_video_i
     body: JSON.stringify({ video_id: videoId }),
   });
   return handleResponse(response);
+}
+
+// Enhanced transcript functions
+export async function transcribeVideoEnhanced(
+  videoId: string, 
+  preferences?: TranscriptPreferences
+): Promise<EnhancedTranscriptResponse> {
+  const requestBody: any = { video_id: videoId };
+  if (preferences) {
+    requestBody.preferences = preferences;
+  }
+  
+  const response = await fetch(`${API_BASE_URL}/transcribe-enhanced/`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    },
+    body: JSON.stringify(requestBody),
+  });
+  return handleResponse<EnhancedTranscriptResponse>(response);
+}
+
+export async function analyzeTranscripts(videoId: string): Promise<TranscriptAnalysisResponse> {
+  const response = await fetch(`${API_BASE_URL}/analyze-transcripts/${videoId}`, {
+    method: 'GET',
+    headers: {
+      'Accept': 'application/json',
+    },
+  });
+  return handleResponse<TranscriptAnalysisResponse>(response);
+}
+
+// Helper function to get the best transcript processing approach
+export async function getOptimalTranscriptApproach(videoId: string): Promise<{
+  approach: string;
+  confidence: string;
+  notes: string[];
+}> {
+  try {
+    const analysis = await analyzeTranscripts(videoId);
+    
+    const confidenceMap: Record<string, string> = {
+      'manual_english': 'High',
+      'auto_english': 'Good', 
+      'manual_translated': 'Medium',
+      'auto_translated': 'Low'
+    };
+    
+    return {
+      approach: analysis.recommended_approach,
+      confidence: confidenceMap[analysis.recommended_approach] || 'Unknown',
+      notes: analysis.processing_notes
+    };
+  } catch (error) {
+    return {
+      approach: 'unknown',
+      confidence: 'Unknown',
+      notes: [`Analysis failed: ${error}`]
+    };
+  }
 }

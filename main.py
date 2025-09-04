@@ -7,8 +7,15 @@ from sqlalchemy.orm import Session
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
 from typing import Optional, List, Dict, Any, Union, Literal
-from core.database import init_db, SessionLocal, Video
+from core.database import init_db, SessionLocal, Video, TranscriptCache
 from youtube_transcript_api import YouTubeTranscriptApi
+from core.services.transcript_service import (
+    get_english_transcript, 
+    TranscriptPreferences, 
+    EnglishTranscriptResult,
+    list_available_transcripts_with_metadata,
+    get_transcript_text
+)
 from repurpose import (
     generate_content_ideas,
     generate_specific_content_pieces,
@@ -55,12 +62,27 @@ class CustomContentStyle(BaseModel):
 # Request/Response Models
 class TranscribeRequest(BaseModel):
     video_id: str = Field(..., description="The YouTube video ID of the video to transcribe.")
+    preferences: Optional[Dict[str, Any]] = Field(None, description="Transcript preferences for English processing")
 
 class TranscriptResponse(BaseModel):
     youtube_video_id: str
     title: Optional[str] = None
     transcript: str
     status: Optional[str] = None
+
+class EnhancedTranscriptResponse(BaseModel):
+    youtube_video_id: str
+    title: Optional[str] = None
+    transcript: str
+    transcript_metadata: Optional[Dict[str, Any]] = None
+    available_languages: List[str] = []
+    status: Optional[str] = None
+
+class TranscriptAnalysisResponse(BaseModel):
+    youtube_video_id: str
+    available_transcripts: List[Dict[str, Any]]
+    recommended_approach: str
+    processing_notes: List[str]
 
 class ProcessVideoRequest(BaseModel):
     video_id: str = Field(..., description="The YouTube video ID of the video to process.")
@@ -290,13 +312,24 @@ async def process_video_stream(request: ProcessVideoRequest, db: Session = Depen
             except Exception:
                 title = None
             
-            yield f"data: {{\"status\": \"transcribing\", \"message\": \"Extracting transcript...\", \"progress\": 30}}\n\n"
+            yield f"data: {{\"status\": \"transcribing\", \"message\": \"Extracting English transcript...\", \"progress\": 30}}\n\n"
             
-            # Get transcript
+            # Get English transcript with enhanced service
             try:
-                transcript_list = YouTubeTranscriptApi.get_transcript(request.video_id)
-                transcript = ' '.join([item['text'] for item in transcript_list])
-                yield f"data: {{\"status\": \"transcript_ready\", \"message\": \"Transcript extracted successfully\", \"progress\": 50}}\n\n"
+                result = await loop.run_in_executor(
+                    executor, 
+                    get_english_transcript, 
+                    request.video_id, 
+                    None
+                )
+                
+                if result:
+                    transcript = result.transcript_text
+                    yield f"data: {{\"status\": \"transcript_ready\", \"message\": \"English transcript extracted ({result.priority.name})\", \"progress\": 50}}\n\n"
+                else:
+                    yield f"data: {{\"status\": \"error\", \"message\": \"Failed to get English transcript\", \"progress\": 50}}\n\n"
+                    return
+                    
             except Exception as e:
                 yield f"data: {{\"status\": \"error\", \"message\": \"Failed to get transcript: {str(e)}\", \"progress\": 50}}\n\n"
                 return
@@ -503,11 +536,29 @@ async def transcribe_video(
             else:
                 print(f"DEBUG: Attempting to transcribe existing video {db_video.youtube_video_id} as transcript is missing.")
                 try:
-                    ytt_api = YouTubeTranscriptApi()
-                    transcript = ytt_api.fetch(db_video.youtube_video_id)
-                    transcript_text = " ".join([entry['text'] for entry in transcript.to_raw_data()]) if transcript else "Transcript unavailable"
+                    # Use enhanced transcript service
+                    result = await loop.run_in_executor(
+                        executor, 
+                        get_english_transcript, 
+                        db_video.youtube_video_id, 
+                        None  # Default preferences
+                    )
+                    
+                    if result:
+                        # Update database with enhanced metadata
+                        transcript_text = result.transcript_text
+                        db_video.transcript_language = result.language_code
+                        db_video.transcript_type = 'auto_generated' if result.is_generated else 'manual'
+                        db_video.is_translated = result.is_translated
+                        db_video.source_language = result.translation_source_language
+                        db_video.translation_confidence = result.confidence_score
+                        db_video.transcript_priority = result.priority.name
+                        db_video.processing_notes = json.dumps(result.processing_notes)
+                    else:
+                        transcript_text = "Transcript unavailable"
+                        
                 except Exception as e:
-                    logging.error(f"Failed to fetch transcript: {str(e)}")
+                    logging.error(f"Failed to fetch enhanced transcript: {str(e)}")
                     transcript_text = "Transcript unavailable"
                 
                 print(f"DEBUG: Transcript fetched for existing video {db_video.youtube_video_id}: {'Success' if transcript_text else 'Failure'}")
@@ -538,22 +589,49 @@ async def transcribe_video(
             
             print(f"DEBUG: Attempting to fetch transcript for new video {youtube_id_from_request}.")
             try:
-                ytt_api = YouTubeTranscriptApi()
-                transcript = ytt_api.fetch(youtube_id_from_request)
-                transcript_text = " ".join([entry['text'] for entry in transcript.to_raw_data()]) if transcript else "Transcript unavailable"
+                # Use enhanced transcript service
+                result = await loop.run_in_executor(
+                    executor, 
+                    get_english_transcript, 
+                    youtube_id_from_request, 
+                    None  # Default preferences
+                )
+                
+                if result:
+                    transcript_text = result.transcript_text
+                    
+                    # Create new video record with enhanced metadata
+                    new_video = Video(
+                        youtube_video_id=youtube_id_from_request,
+                        title=video_title,
+                        transcript=transcript_text,
+                        status="processed",
+                        transcript_language=result.language_code,
+                        transcript_type='auto_generated' if result.is_generated else 'manual',
+                        is_translated=result.is_translated,
+                        source_language=result.translation_source_language,
+                        translation_confidence=result.confidence_score,
+                        transcript_priority=result.priority.name,
+                        processing_notes=json.dumps(result.processing_notes)
+                    )
+                else:
+                    transcript_text = "Transcript unavailable"
+                    new_video = Video(
+                        youtube_video_id=youtube_id_from_request,
+                        title=video_title,
+                        transcript=transcript_text,
+                        status="failed"
+                    )
+                    
             except Exception as e:
-                logging.error(f"Failed to fetch transcript: {str(e)}")
+                logging.error(f"Failed to fetch enhanced transcript: {str(e)}")
                 transcript_text = "Transcript unavailable"
-            
-            print(f"DEBUG: Transcript for {youtube_id_from_request}: {'Fetched' if transcript_text else 'Failed to fetch'}")
-
-            print(f"DEBUG: Creating new Video object for {youtube_id_from_request} with title '{video_title}'.")
-            new_video = Video(
-                youtube_video_id=youtube_id_from_request,
-                title=video_title,
-                transcript=transcript_text,
-                status="processed"
-            )
+                new_video = Video(
+                    youtube_video_id=youtube_id_from_request,
+                    title=video_title,
+                    transcript=transcript_text,
+                    status="failed"
+                )
             print(f"DEBUG: Adding new video {youtube_id_from_request} to DB session.")
             db.add(new_video)
             print(f"DEBUG: Committing new video {youtube_id_from_request} to DB.")
@@ -603,11 +681,21 @@ async def process_video(
                 video_title = "Unknown Title"
             
             try:
-                ytt_api = YouTubeTranscriptApi()
-                transcript = ytt_api.fetch(youtube_id_from_request)
-                transcript_text = " ".join([entry['text'] for entry in transcript.to_raw_data()]) if transcript else "Transcript unavailable"
+                # Use enhanced transcript service for English preference
+                result = await loop.run_in_executor(
+                    executor, 
+                    get_english_transcript, 
+                    youtube_id_from_request, 
+                    None
+                )
+                
+                if result:
+                    transcript_text = result.transcript_text
+                else:
+                    transcript_text = "Transcript unavailable"
+                    
             except Exception as e:
-                logging.error(f"Failed to fetch transcript: {str(e)}")
+                logging.error(f"Failed to fetch enhanced transcript: {str(e)}")
                 transcript_text = "Transcript unavailable"
 
             new_video = Video(
@@ -628,11 +716,29 @@ async def process_video(
             
             if not db_video.transcript:
                 try:
-                    ytt_api = YouTubeTranscriptApi()
-                    transcript = ytt_api.fetch(db_video.youtube_video_id)
-                    transcript_text = " ".join([entry['text'] for entry in transcript.to_raw_data()]) if transcript else "Transcript unavailable"
+                    # Use enhanced transcript service for English preference
+                    result = await loop.run_in_executor(
+                        executor, 
+                        get_english_transcript, 
+                        db_video.youtube_video_id, 
+                        None
+                    )
+                    
+                    if result:
+                        transcript_text = result.transcript_text
+                        # Update metadata
+                        db_video.transcript_language = result.language_code
+                        db_video.transcript_type = 'auto_generated' if result.is_generated else 'manual'
+                        db_video.is_translated = result.is_translated
+                        db_video.source_language = result.translation_source_language
+                        db_video.translation_confidence = result.confidence_score
+                        db_video.transcript_priority = result.priority.name
+                        db_video.processing_notes = json.dumps(result.processing_notes)
+                    else:
+                        transcript_text = "Transcript unavailable"
+                        
                 except Exception as e:
-                    logging.error(f"Failed to fetch transcript: {str(e)}")
+                    logging.error(f"Failed to fetch enhanced transcript: {str(e)}")
                     transcript_text = "Transcript unavailable"
                 
                 db_video.transcript = transcript_text
@@ -898,3 +1004,166 @@ async def edit_content_piece(
         logging.exception(f"Unexpected error in /edit-content/ for {request.content_piece_id}: {str(e)}")
         if db.is_active: db.rollback()
         raise HTTPException(status_code=500, detail=f"An unexpected error occurred while editing content piece: {str(e)}")
+
+# New Enhanced Transcript Endpoints
+@app.post("/transcribe-enhanced/", response_model=EnhancedTranscriptResponse)
+async def transcribe_video_enhanced(
+    request: TranscribeRequest,
+    db: Session = Depends(get_db)
+):
+    """Enhanced transcription endpoint with English preference and detailed metadata"""
+    loop = asyncio.get_event_loop()
+    youtube_id_from_request: str = request.video_id
+    
+    try:
+        # Parse transcript preferences if provided
+        preferences = None
+        if request.preferences:
+            try:
+                preferences = TranscriptPreferences(**request.preferences)
+            except Exception as e:
+                logging.warning(f"Invalid transcript preferences: {e}, using defaults")
+                preferences = TranscriptPreferences()
+        
+        # Get enhanced transcript result
+        result = await loop.run_in_executor(
+            executor,
+            get_english_transcript,
+            youtube_id_from_request,
+            preferences
+        )
+        
+        if not result:
+            raise HTTPException(status_code=404, detail=f"No transcript available for video {youtube_id_from_request}")
+        
+        # Get video title
+        try:
+            title = await loop.run_in_executor(executor, get_video_title, youtube_id_from_request)
+        except Exception:
+            title = "Unknown Title"
+        
+        # Get available languages
+        available_languages = await loop.run_in_executor(
+            executor,
+            list_available_transcripts_with_metadata,
+            youtube_id_from_request
+        )
+        
+        # Prepare transcript metadata
+        transcript_metadata = {
+            "language_code": result.language_code,
+            "language": result.language,
+            "is_generated": result.is_generated,
+            "is_translated": result.is_translated,
+            "priority": result.priority.name,
+            "translation_source_language": result.translation_source_language,
+            "confidence_score": result.confidence_score,
+            "processing_notes": result.processing_notes
+        }
+        
+        # Update database
+        db_video = db.query(Video).filter(Video.youtube_video_id == youtube_id_from_request).first()
+        
+        if db_video:
+            db_video.transcript = result.transcript_text
+            db_video.transcript_language = result.language_code
+            db_video.transcript_type = 'auto_generated' if result.is_generated else 'manual'
+            db_video.is_translated = result.is_translated
+            db_video.source_language = result.translation_source_language
+            db_video.translation_confidence = result.confidence_score
+            db_video.transcript_priority = result.priority.name
+            db_video.processing_notes = json.dumps(result.processing_notes)
+            db_video.status = "processed"
+        else:
+            db_video = Video(
+                youtube_video_id=youtube_id_from_request,
+                title=title,
+                transcript=result.transcript_text,
+                status="processed",
+                transcript_language=result.language_code,
+                transcript_type='auto_generated' if result.is_generated else 'manual',
+                is_translated=result.is_translated,
+                source_language=result.translation_source_language,
+                translation_confidence=result.confidence_score,
+                transcript_priority=result.priority.name,
+                processing_notes=json.dumps(result.processing_notes)
+            )
+            db.add(db_video)
+        
+        db.commit()
+        db.refresh(db_video)
+        
+        return EnhancedTranscriptResponse(
+            youtube_video_id=youtube_id_from_request,
+            title=title,
+            transcript=result.transcript_text,
+            transcript_metadata=transcript_metadata,
+            available_languages=[meta.language_code for meta in available_languages],
+            status="success"
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.exception(f"Error in enhanced transcription for {youtube_id_from_request}: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to process enhanced transcript: {str(e)}")
+
+@app.get("/analyze-transcripts/{video_id}", response_model=TranscriptAnalysisResponse)
+async def analyze_available_transcripts(video_id: str):
+    """Analyze available transcripts for a video and recommend processing approach"""
+    loop = asyncio.get_event_loop()
+    
+    try:
+        # Get available transcript metadata
+        metadata_list = await loop.run_in_executor(
+            executor,
+            list_available_transcripts_with_metadata,
+            video_id
+        )
+        
+        if not metadata_list:
+            raise HTTPException(status_code=404, detail=f"No transcripts found for video {video_id}")
+        
+        # Determine recommended approach
+        processing_notes = []
+        recommended_approach = "auto_translated"
+        
+        for meta in metadata_list:
+            if meta.language_code.lower() == 'en' and not meta.is_generated:
+                recommended_approach = "manual_english"
+                processing_notes.append("Manual English transcript available - highest quality")
+                break
+            elif meta.language_code.lower() == 'en' and meta.is_generated:
+                recommended_approach = "auto_english"
+                processing_notes.append("Auto-generated English transcript available - good quality")
+            elif not meta.is_generated and meta.is_translatable:
+                if recommended_approach not in ["manual_english", "auto_english"]:
+                    recommended_approach = "manual_translated"
+                    processing_notes.append(f"Manual {meta.language} transcript available for translation")
+            elif meta.is_generated and meta.is_translatable:
+                if recommended_approach == "auto_translated":
+                    processing_notes.append(f"Auto-generated {meta.language} transcript available for translation")
+        
+        # Convert metadata to dict format
+        available_transcripts = [
+            {
+                "language_code": meta.language_code,
+                "language": meta.language,
+                "is_generated": meta.is_generated,
+                "is_translatable": meta.is_translatable
+            }
+            for meta in metadata_list
+        ]
+        
+        return TranscriptAnalysisResponse(
+            youtube_video_id=video_id,
+            available_transcripts=available_transcripts,
+            recommended_approach=recommended_approach,
+            processing_notes=processing_notes
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.exception(f"Error analyzing transcripts for {video_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to analyze transcripts: {str(e)}")
