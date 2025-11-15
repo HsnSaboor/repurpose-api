@@ -8,9 +8,11 @@ Transform any YouTube video into Instagram Reels, Tweets, and Image Carousels wi
 
 - **🎥 Video Transcription**: Extract accurate transcripts from YouTube videos
 - **🤖 AI Content Generation**: Generate Instagram Reels, Tweets, and Image Carousels using advanced LLM
+- **⚙️ Fully Configurable**: Customize field lengths, slide counts, and content generation settings per content type
 - **✏️ Natural Language Editing**: Edit generated content using simple prompts
 - **🔄 Smart Validation**: Automatically retry and fix validation errors to ensure 100% content recovery
 - **📦 Bulk Processing**: Process multiple videos simultaneously
+- **📝 Enhanced Carousel Content**: Generate detailed, comprehensive carousel slides (800 chars with 3-5 sentences)
 - **🌐 REST API**: Complete RESTful API with comprehensive documentation
 - **⚡ Fast & Scalable**: Built with FastAPI for high performance
 
@@ -119,6 +121,8 @@ REQUESTS_PER_MINUTE=60
 | `/edit-content/` | POST | Edit generated content with natural language |
 | `/content-styles/presets/` | GET | Get available content style presets |
 | `/content-styles/presets/{preset_name}` | GET | Get details of a specific style preset |
+| `/content-config/default` | GET | Get default content generation configuration |
+| `/content-config/current` | GET | Get currently active configuration |
 
 ### Utilities
 
@@ -173,6 +177,71 @@ const response = await fetch('/process-video/', {
   })
 });
 ```
+
+## ⚙️ Content Generation Configuration
+
+The API provides **full control over content generation settings** including field lengths, number of ideas, and slides per carousel.
+
+### 🔧 Configurable Settings
+
+- **Field Length Limits**: Customize maximum length for titles, captions, scripts, slide content, etc.
+- **Carousel Settings**: Control number of slides (4-15+) and slide text length (300-1200+ chars)
+- **Idea Generation**: Set min/max number of content ideas to generate (3-20+)
+- **Content per Type**: Configure generation behavior per content type (Reels, Carousels, Tweets)
+
+### 📏 Default Carousel Settings (Enhanced)
+
+The carousel slide content has been **significantly enhanced** for more detailed, valuable content:
+
+- **Slide Text Length**: 800 characters (increased from 300)
+- **Slide Content**: 3-5 detailed sentences with examples and actionable information
+- **Content Style**: Mini-article approach, not just captions
+- **Recommended Range**: 400-800 characters per slide
+
+### 🎛️ View Current Configuration
+
+```bash
+# Get default configuration
+GET /content-config/default
+
+# Get currently active configuration
+GET /content-config/current
+```
+
+### 🔄 Override Configuration Per Request
+
+```javascript
+// Process with custom field limits
+const response = await fetch('/process-video/', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    video_id: 'dQw4w9WgXcQ',
+    custom_style: {
+      target_audience: "developers",
+      language: "English",
+      content_config: {
+        min_ideas: 10,
+        max_ideas: 15,
+        field_limits: {
+          carousel_slide_text_max: 1000,  // Longer, more detailed slides
+          carousel_min_slides: 6,
+          carousel_max_slides: 12,
+          reel_script_max: 2500
+        }
+      }
+    }
+  })
+});
+```
+
+### 📚 Configuration Documentation
+
+For complete details on configuration options, see:
+- **[Content Configuration Guide](./CONTENT_CONFIGURATION_GUIDE.md)** - Comprehensive API configuration documentation
+- **[CLI Configuration Guide](./CLI_CONFIGURATION_GUIDE.md)** - CLI usage and configuration options
+- **[Quick Reference](./QUICK_REFERENCE_CONFIG.md)** - Quick reference cheat sheet
+- **[Configuration Update Summary](./CONFIGURATION_UPDATE_SUMMARY.md)** - Technical details of recent enhancements
 
 ## 💻 Frontend Integration Examples
 
@@ -274,6 +343,64 @@ if response.status_code == 200:
             edited = edit_response.json()
             print(f"Successfully edited content: {edited['changes_made']}")
 ```
+
+## 🖥️ CLI Usage
+
+The project includes a powerful CLI for direct content generation without running the API server.
+
+### Basic CLI Usage
+
+```bash
+# Show current configuration
+python repurpose.py --show-config
+
+# Process a single video (uses enhanced defaults: 800 char slides)
+python repurpose.py "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+
+# Process multiple videos
+python repurpose.py "video1,video2,video3"
+
+# Process from file
+python repurpose.py videos.txt
+
+# Process document (TXT, MD, DOCX, PDF)
+python repurpose.py article.pdf
+```
+
+### CLI Configuration Options
+
+```bash
+# Custom carousel configuration
+python repurpose.py video.txt --carousel-text-max 1000
+
+# More slides per carousel
+python repurpose.py video.txt --carousel-slides-max 12
+
+# Generate more content ideas
+python repurpose.py video.txt --min-ideas 10 --max-ideas 15
+
+# Combined configuration
+python repurpose.py videos.txt \
+  --carousel-text-max 1200 \
+  --carousel-slides-max 15 \
+  --min-ideas 12
+```
+
+### CLI Configuration Flags
+
+| Flag | Description | Default |
+|------|-------------|---------|
+| `--carousel-text-max N` | Max chars per slide text | 800 |
+| `--carousel-slides-min N` | Min slides per carousel | 4 |
+| `--carousel-slides-max N` | Max slides per carousel | 8 |
+| `--min-ideas N` | Min content ideas | 6 |
+| `--max-ideas N` | Max content ideas | 8 |
+| `--show-config` | Show configuration | - |
+| `-l, --limit N` | Process only first N | All |
+
+**For detailed CLI usage, see:** [CLI_CONFIGURATION_GUIDE.md](./CLI_CONFIGURATION_GUIDE.md)
+
+---
 
 ## 🧪 Testing
 

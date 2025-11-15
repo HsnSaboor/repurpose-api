@@ -31,9 +31,10 @@ from rich.progress import (BarColumn, Progress, SpinnerColumn, TaskProgressColum
 from yt_dlp.utils import DownloadError
 
 # Import services
-from core.services.transcript_service import get_transcript_text
+from core.services.transcript_service import get_english_transcript, TranscriptPreferences
 from core.services.content_service import ContentGenerator, ContentIdea
 from core.services.video_service import get_video_title
+from core.services.document_service import DocumentParser, extract_text_from_document
 
 # Load environment variables from .env file
 load_dotenv()
@@ -67,17 +68,46 @@ class ContentType(str, Enum):
     IMAGE_CAROUSEL = "image_carousel"
     TWEET = "tweet"
 
+# Default content field limits (can be overridden via config)
+DEFAULT_FIELD_LIMITS = {
+    "reel_title_max": 100,
+    "reel_caption_max": 300,
+    "reel_hook_max": 200,
+    "reel_script_max": 2000,
+    "carousel_title_max": 100,
+    "carousel_caption_max": 300,
+    "carousel_slide_heading_max": 100,
+    "carousel_slide_text_max": 800,  # Increased from 300 for more detailed content
+    "carousel_min_slides": 4,
+    "carousel_max_slides": 8,
+    "tweet_title_max": 100,
+    "tweet_text_max": 280,
+    "tweet_thread_item_max": 280
+}
+
+# Global variable to store current field limits (can be updated dynamically)
+CURRENT_FIELD_LIMITS = DEFAULT_FIELD_LIMITS.copy()
+
+def update_field_limits(new_limits: dict):
+    """Update the global field limits configuration"""
+    global CURRENT_FIELD_LIMITS
+    CURRENT_FIELD_LIMITS.update(new_limits)
+
+def get_field_limit(key: str) -> int:
+    """Get a specific field limit"""
+    return CURRENT_FIELD_LIMITS.get(key, DEFAULT_FIELD_LIMITS.get(key, 1000))
+
 class CarouselSlide(BaseModel):
     slide_number: int
     step_number: int = Field(..., description="Step number in the carousel.")
-    step_heading : str = Field(..., max_length=100, description="Heading for this step.")
-    text: str = Field(None, max_length=300, description="text content for the slide.")
+    step_heading : str = Field(..., description="Heading for this step.")
+    text: str = Field(None, description="Detailed text content for the slide. This is the main content.")
 
 class Reel(BaseModel):
     content_id: str = Field(..., description="Serial number for this content.")
     content_type: Literal[ContentType.REEL] = ContentType.REEL
-    title: str = Field(..., max_length=100)
-    caption: str = Field(None, max_length=300)
+    title: str = Field(...)
+    caption: str = Field(None)
     hook: str = Field(..., description="Attention-grabbing hook.")
     script_body: str = Field(..., description="Main script content.")
     visual_suggestions: Optional[str] = Field(None)
@@ -86,16 +116,16 @@ class Reel(BaseModel):
 class ImageCarousel(BaseModel):
     content_id: str = Field(..., description="Serial number for this content.")
     content_type: Literal[ContentType.IMAGE_CAROUSEL] = ContentType.IMAGE_CAROUSEL
-    title: str = Field(..., max_length=100)
-    caption: str = Field(None, max_length=300)
-    slides: List[CarouselSlide] = Field(..., min_length=4)
+    title: str = Field(...)
+    caption: str = Field(None)
+    slides: List[CarouselSlide] = Field(...)
     hashtags: List[str] = Field(None)
 
 class Tweet(BaseModel):
     content_id: str = Field(..., description="Serial number for this content.")
     content_type: Literal[ContentType.TWEET] = ContentType.TWEET
-    title: str = Field(..., max_length=100)
-    tweet_text: str = Field(..., max_length=280)
+    title: str = Field(...)
+    tweet_text: str = Field(...)
     thread_continuation: Optional[List[str]] = Field(None)
     hashtags: List[str] = Field(None)
 
@@ -164,28 +194,32 @@ def call_gemini_api(system_prompt: str, user_prompt: str) -> Optional[Dict[str, 
         logger.error(f"Error in API call: {e}", exc_info=True)
     return None
 
-# --- FIX: RESTORED EXPLICIT JSON STRUCTURE TO THE PROMPT ---
-SYSTEM_PROMPT_GENERATE_IDEAS = f"""
+def get_system_prompt_generate_ideas(content_style: str = "{CONTENT_STYLE}", min_ideas: int = 6, max_ideas: int = 8) -> str:
+    """Generate the system prompt for idea generation with configurable limits"""
+    return f"""
 You are an expert AI assistant specializing in analyzing video transcripts to identify diverse, repurposable content ideas.
-Your goal is to analyze the provided transcript and suggest several distinct content ideas (Reels, Image Carousels, Tweets).
+Your goal is to analyze the provided transcript and suggest {min_ideas} to {max_ideas} distinct content ideas (Reels, Image Carousels, Tweets).
 
 Output Format:
 You MUST return a single JSON object. This object must have a single key named "ideas".
-You are not limited to just one idea per type — generate as many as the transcript allows. Use your judgment to decide.
-The value for "ideas" must be a list of JSON objects. Each object in the list represents one content idea and MUST have the following structure:
-{{
+The value for "ideas" must be a list of JSON objects with {min_ideas} to {max_ideas} items.
+Each object in the list represents one content idea and MUST have the following structure:
+{{{{
   "suggested_content_type": "<'reel'|'image_carousel'|'tweet'>",
   "suggested_title": "<string, a catchy and relevant title for the content>",
   "relevant_transcript_snippet": "<string, a short, direct quote from the transcript that inspired this idea>",
-  "type_specific_suggestions": {{}}
-}}
+  "type_specific_suggestions": {{{{}}}}
+}}}}
 
 Content Style to Follow:
-{CONTENT_STYLE}
+{content_style}
 """
 
-# --- FIX: MADE THE SYSTEM PROMPT FOR CONTENT GENERATION HYPER-EXPLICIT ---
-SYSTEM_PROMPT_GENERATE_CONTENT =f"""
+def get_system_prompt_generate_content(content_style: str = "{CONTENT_STYLE}") -> str:
+    """Generate the system prompt for content generation with configurable field limits"""
+    limits = CURRENT_FIELD_LIMITS
+    
+    return f"""
 You are an expert AI content creator. Your task is to take a specific content idea and generate the full content piece.
 You MUST follow the JSON schema for the requested `content_type` with absolute precision. All required fields MUST be included.
 
@@ -193,48 +227,48 @@ You MUST follow the JSON schema for the requested `content_type` with absolute p
 
 If `content_type` is "reel", the JSON MUST look like this:
 ```json
-{{
+{{{{
   "content_type": "reel",
-  "title": "<string, the title for the reel>",
-  "caption": "<string, a short, engaging caption, max 300 chars>",
-  "hook": "<string, a strong, attention-grabbing opening line, required>",
-  "script_body": "<string, the main script for the reel, required>",
+  "title": "<string, the title for the reel, max {limits['reel_title_max']} chars>",
+  "caption": "<string, a short, engaging caption, max {limits['reel_caption_max']} chars>",
+  "hook": "<string, a strong, attention-grabbing opening line, max {limits['reel_hook_max']} chars, required>",
+  "script_body": "<string, the main script for the reel, max {limits['reel_script_max']} chars, required>",
   "visual_suggestions": "<string, optional suggestions for visuals>",
   "hashtags": ["<list of relevant string hashtags>"]
-}}
+}}}}
 
 
 If content_type is "image_carousel", the JSON MUST look like this:
       
-{{
+{{{{
   "content_type": "image_carousel",
-  "title": "<string, the title for the carousel>",
-  "caption": "<string, a short, engaging caption>",
+  "title": "<string, the title for the carousel, max {limits['carousel_title_max']} chars>",
+  "caption": "<string, a short, engaging caption, max {limits['carousel_caption_max']} chars>",
   "slides": [
-    {{
+    {{{{
       "slide_number": 1,
       "step_number": 1,
-      "step_heading": "<string, the heading for this step, max 100 chars>",
-      "text": "<text string, the text to display on this slide dont add heading or step_number here, only text>"
+      "step_heading": "<string, SHORT heading for this step, max {limits['carousel_slide_heading_max']} chars - e.g., 'Step 1: Setup' or 'Choose Your Niche'>",
+      "text": "<string, DETAILED TEXT CONTENT - This is the PRIMARY content field. Write 3-5 sentences with specific details, examples, actionable tips, or explanations. Make it comprehensive and valuable. Min 400 chars recommended, max {limits['carousel_slide_text_max']} chars. Do NOT repeat the heading - only provide the detailed explanation.>"
     }},
-    {{
+    {{{{
       "slide_number": 2,
       "step_number": 2,
-      "step_heading": "<string, the heading for this step, max 100 chars>",
-      "text": "<text string, the text to display on this slide dont add heading or step_number here, only text>"
+      "step_heading": "<string, SHORT heading for this step, max {limits['carousel_slide_heading_max']} chars>",
+      "text": "<string, DETAILED TEXT CONTENT - Multiple sentences with specifics, reasoning, examples, and actionable information. Make this substantial and informative. 400-{limits['carousel_slide_text_max']} chars.>"
     }},
-    {{
+    {{{{
       "slide_number": 3,
       "step_number": 3,
-      "step_heading": "<string, the heading for this step, max 100 chars>",
-      "text": "<text string, the text to display on this slide dont add heading or step_number here, only text>"
+      "step_heading": "<string, SHORT heading for this step, max {limits['carousel_slide_heading_max']} chars>",
+      "text": "<string, DETAILED TEXT CONTENT - Provide depth and context. Include why, how, or what makes this important. Use examples if relevant. 400-{limits['carousel_slide_text_max']} chars.>"
     }},
-    {{
+    {{{{
       "slide_number": 4,
       "step_number": 4,
-      "step_heading": "<string, the heading for this step, max 100 chars>",
-      "text": "<text string, the text to display on this slide dont add heading or step_number here, only text>"
-    }}
+      "step_heading": "<string, SHORT heading for this step, max {limits['carousel_slide_heading_max']} chars>",
+      "text": "<string, DETAILED TEXT CONTENT - Comprehensive explanation with actionable details. Think mini-article, not caption. 400-{limits['carousel_slide_text_max']} chars.>"
+    }}}}
   ],
   "hashtags": ["<list of relevant string hashtags>"]
 }}
@@ -242,33 +276,49 @@ If content_type is "image_carousel", the JSON MUST look like this:
 
 If content_type is "tweet", the JSON MUST look like this:
       
-{{
+{{{{
   "content_type": "tweet",
-  "title": "<string, an internal title for the tweet>",
-  "tweet_text": "<string, the main tweet content, max 280 chars, required>",
-  "thread_continuation": ["<list of optional strings for a follow-up thread>"],
+  "title": "<string, an internal title for the tweet, max {limits['tweet_title_max']} chars>",
+  "tweet_text": "<string, the main tweet content, max {limits['tweet_text_max']} chars, required>",
+  "thread_continuation": ["<list of optional strings for a follow-up thread, each max {limits['tweet_thread_item_max']} chars>"],
   "hashtags": ["<list of relevant string hashtags>"]
-}}
+}}}}
 
 
 MANDATORY INSTRUCTIONS:
 
-    For an image_carousel, you MUST generate at least 4 slides.
+    For an image_carousel, you MUST generate at least {limits['carousel_min_slides']} slides and at most {limits['carousel_max_slides']} slides.
+    
+    For carousel slides, the "text" field is the PRIMARY content and MUST be detailed, comprehensive, and valuable:
+    - Each slide text should be 400-{limits['carousel_slide_text_max']} characters (aim for longer, more detailed content)
+    - Include multiple sentences with actionable information, examples, or explanations
+    - Provide context, reasoning, or supporting details - not just a single statement
+    - Make the text self-contained and informative without relying solely on the heading
+    - Think of it as a mini-article or detailed explanation, not just a caption
+    
+    The step_heading is just a short label (max {limits['carousel_slide_heading_max']} chars), while the text field is where the real value lies.
 
-    Stirctly Follow the Language Constraint in {CONTENT_STYLE}.
+    Stirctly Follow the Language Constraint in {content_style}.
 
     Your entire output must be a single, valid JSON object that matches one of the schemas above.
 
     Do NOT include content_id in your response.
 
-    The generated text must strictly follow this style: {CONTENT_STYLE}
+    The generated text must strictly follow this style: {content_style}
 """
 
-def generate_content_ideas(transcript: str, style_preset: Optional[str] = None, custom_style: Optional[Dict[str, Any]] = None) -> Optional[List[Dict[str, Any]]]:
-    """Generate content ideas with optional style customization"""
-    # Import get_content_style_prompt from main.py to avoid circular imports
-    # We'll construct the style prompt here to avoid import issues
+def generate_content_ideas(transcript: str, style_preset: Optional[str] = None, custom_style: Optional[Dict[str, Any]] = None, content_config: Optional[Dict[str, Any]] = None) -> Optional[List[Dict[str, Any]]]:
+    """Generate content ideas with optional style customization and configurable limits"""
     
+    # Update field limits if provided in content_config
+    if content_config and 'field_limits' in content_config:
+        update_field_limits(content_config['field_limits'])
+    
+    # Get min/max ideas from config
+    min_ideas = content_config.get('min_ideas', 6) if content_config else 6
+    max_ideas = content_config.get('max_ideas', 8) if content_config else 8
+    
+    # Build style text
     if custom_style:
         style_text = f"""
         "Target Audience: {custom_style.get('target_audience', 'general audience')}"
@@ -280,11 +330,9 @@ def generate_content_ideas(transcript: str, style_preset: Optional[str] = None, 
         if custom_style.get('additional_instructions'):
             style_text += f'"Additional Instructions: {custom_style["additional_instructions"]}"'
     elif style_preset:
-        # Use default styles or preset-specific content
         if style_preset == "ecommerce_entrepreneur":
-            style_text = CONTENT_STYLE  # Use the existing Roman Urdu style
+            style_text = CONTENT_STYLE
         else:
-            # For other presets, we'll use a generic style (could be expanded)
             style_text = """
             "Target Audience: general audience interested in the topic"
             "Call To Action: engage with our content and follow for more"
@@ -293,28 +341,10 @@ def generate_content_ideas(transcript: str, style_preset: Optional[str] = None, 
             "Tone: Professional and engaging"
             """
     else:
-        # Default to the original style
         style_text = CONTENT_STYLE
     
-    # Create dynamic system prompt with the selected style
-    dynamic_system_prompt = f"""
-You are an expert AI assistant specializing in analyzing video transcripts to identify diverse, repurposable content ideas.
-Your goal is to analyze the provided transcript and suggest several distinct content ideas (Reels, Image Carousels, Tweets).
-
-Output Format:
-You MUST return a single JSON object. This object must have a single key named "ideas".
-You are not limited to just one idea per type — generate as many as the transcript allows. Use your judgment to decide.
-The value for "ideas" must be a list of JSON objects. Each object in the list represents one content idea and MUST have the following structure:
-{{
-  "suggested_content_type": "<'reel'|'image_carousel'|'tweet'>",
-  "suggested_title": "<string, a catchy and relevant title for the content>",
-  "relevant_transcript_snippet": "<string, a short, direct quote from the transcript that inspired this idea>",
-  "type_specific_suggestions": {{}}
-}}
-
-Content Style to Follow:
-{style_text}
-"""
+    # Generate dynamic system prompt with configured limits
+    dynamic_system_prompt = get_system_prompt_generate_ideas(style_text, min_ideas, max_ideas)
     
     user_prompt = f"Transcript:\n{transcript}\n\nPlease analyze and generate ideas based on system prompt instructions."
     raw_response = content_generator.generate_content(dynamic_system_prompt, user_prompt)
@@ -328,6 +358,9 @@ Content Style to Follow:
 def edit_content_piece_with_diff(original_content: Dict[str, Any], edit_prompt: str, content_type: str) -> Optional[Dict[str, Any]]:
     """Edit a content piece using LLM with diff-based editing"""
     
+    # Get current field limits
+    limits = CURRENT_FIELD_LIMITS
+    
     # Create a system prompt for diff-based editing
     edit_system_prompt = f"""
 You are an expert content editor specializing in precise, diff-based editing of social media content.
@@ -337,11 +370,11 @@ Your task is to make ONLY the specific changes requested by the user while prese
 1. Make ONLY the changes explicitly requested in the edit prompt
 2. Preserve all other content exactly as it was
 3. Ensure the edited content still meets all validation requirements:
-   - caption: Maximum 300 characters
-   - title: Maximum 100 characters  
-   - tweet_text: Maximum 280 characters (for tweets)
-   - step_heading: Maximum 100 characters (for carousel slides)
-   - slide text: Maximum 300 characters (for carousel slides)
+   - caption: Maximum {limits['carousel_caption_max']} characters (for carousels) or {limits['reel_caption_max']} characters (for reels)
+   - title: Maximum {limits['reel_title_max']} characters
+   - tweet_text: Maximum {limits['tweet_text_max']} characters (for tweets)
+   - step_heading: Maximum {limits['carousel_slide_heading_max']} characters (for carousel slides)
+   - slide text: Maximum {limits['carousel_slide_text_max']} characters (for carousel slides) - should be detailed and comprehensive
 
 **CONTENT TYPE SPECIFIC REQUIREMENTS:**
 {CONTENT_STYLE}
@@ -439,6 +472,9 @@ def fix_validation_errors(raw_content: Dict[str, Any], validation_error: Validat
             message = error['msg']
             error_details.append(f"Field '{field}': {message} (type: {error_type})")
         
+        # Get current field limits
+        limits = CURRENT_FIELD_LIMITS
+        
         # Create a specific prompt to fix the validation issues
         fix_prompt = f"""The previously generated content failed validation with these specific errors:
 
@@ -447,11 +483,11 @@ def fix_validation_errors(raw_content: Dict[str, Any], validation_error: Validat
 Please regenerate the content for '{idea.suggested_content_type}' type, ensuring ALL validation requirements are met:
 
 **CRITICAL REQUIREMENTS:**
-- caption: Must be 300 characters or less
-- title: Must be 100 characters or less
-- tweet_text: Must be 280 characters or less (for tweets)
-- step_heading: Must be 100 characters or less (for carousel slides)
-- slide text: Must be 300 characters or less (for carousel slides)
+- caption: Must be {limits['carousel_caption_max']} characters or less (for carousels) or {limits['reel_caption_max']} characters or less (for reels)
+- title: Must be {limits['reel_title_max']} characters or less (max for all types)
+- tweet_text: Must be {limits['tweet_text_max']} characters or less (for tweets)
+- step_heading: Must be {limits['carousel_slide_heading_max']} characters or less (for carousel slides)
+- slide text: Must be {limits['carousel_slide_text_max']} characters or less (for carousel slides) - make this detailed and comprehensive
 
 Content Idea: {json.dumps(idea.model_dump(), indent=2)}
 
@@ -491,10 +527,14 @@ Please fix the specific validation errors and regenerate the complete content pi
     console.log(f"[red]❌ Failed to fix validation errors after {max_retries} attempts[/red]")
     return None
 
-def generate_specific_content_pieces(ideas: List[ContentIdea], original_transcript: str, video_url: str, style_preset: Optional[str] = None, custom_style: Optional[Dict[str, Any]] = None) -> GeneratedContentList:
-    """Generate specific content pieces with optional style customization"""
+def generate_specific_content_pieces(ideas: List[ContentIdea], original_transcript: str, video_url: str, style_preset: Optional[str] = None, custom_style: Optional[Dict[str, Any]] = None, content_config: Optional[Dict[str, Any]] = None) -> GeneratedContentList:
+    """Generate specific content pieces with optional style customization and configurable limits"""
     generated_pieces = []
     video_id = extract_video_id(video_url) or "unknown"
+    
+    # Update field limits if provided in content_config
+    if content_config and 'field_limits' in content_config:
+        update_field_limits(content_config['field_limits'])
     
     # Create dynamic style text based on parameters
     if custom_style:
@@ -508,11 +548,9 @@ def generate_specific_content_pieces(ideas: List[ContentIdea], original_transcri
         if custom_style.get('additional_instructions'):
             style_text += f'"Additional Instructions: {custom_style["additional_instructions"]}"'
     elif style_preset:
-        # Use default styles or preset-specific content
         if style_preset == "ecommerce_entrepreneur":
-            style_text = CONTENT_STYLE  # Use the existing Roman Urdu style
+            style_text = CONTENT_STYLE
         else:
-            # For other presets, we'll use a generic style (could be expanded)
             style_text = """
             "Target Audience: general audience interested in the topic"
             "Call To Action: engage with our content and follow for more"
@@ -521,88 +559,11 @@ def generate_specific_content_pieces(ideas: List[ContentIdea], original_transcri
             "Tone: Professional and engaging"
             """
     else:
-        # Default to the original style
         style_text = CONTENT_STYLE
     
-    # Create dynamic system prompt with the selected style
-    dynamic_system_prompt = f"""
-You are an expert AI content creator. Your task is to take a specific content idea and generate the full content piece.
-You MUST follow the JSON schema for the requested `content_type` with absolute precision. All required fields MUST be included.
-
-**Content Type Schemas:**
-
-If `content_type` is "reel", the JSON MUST look like this:
-```json
-{{
-  "content_type": "reel",
-  "title": "<string, the title for the reel>",
-  "caption": "<string, a short, engaging caption, max 300 chars>",
-  "hook": "<string, a strong, attention-grabbing opening line, required>",
-  "script_body": "<string, the main script for the reel, required>",
-  "visual_suggestions": "<string, optional suggestions for visuals>",
-  "hashtags": ["<list of relevant string hashtags>"]
-}}
-
-
-If content_type is "image_carousel", the JSON MUST look like this:
-      
-{{
-  "content_type": "image_carousel",
-  "title": "<string, the title for the carousel>",
-  "caption": "<string, a short, engaging caption>",
-  "slides": [
-    {{
-      "slide_number": 1,
-      "step_number": 1,
-      "step_heading": "<string, the heading for this step, max 100 chars>",
-      "text": "<text string, the text to display on this slide dont add heading or step_number here, only text>"
-    }},
-    {{
-      "slide_number": 2,
-      "step_number": 2,
-      "step_heading": "<string, the heading for this step, max 100 chars>",
-      "text": "<text string, the text to display on this slide dont add heading or step_number here, only text>"
-    }},
-    {{
-      "slide_number": 3,
-      "step_number": 3,
-      "step_heading": "<string, the heading for this step, max 100 chars>",
-      "text": "<text string, the text to display on this slide dont add heading or step_number here, only text>"
-    }},
-    {{
-      "slide_number": 4,
-      "step_number": 4,
-      "step_heading": "<string, the heading for this step, max 100 chars>",
-      "text": "<text string, the text to display on this slide dont add heading or step_number here, only text>"
-    }}
-  ],
-  "hashtags": ["<list of relevant string hashtags>"]
-}}
-
-
-If content_type is "tweet", the JSON MUST look like this:
-      
-{{
-  "content_type": "tweet",
-  "title": "<string, an internal title for the tweet>",
-  "tweet_text": "<string, the main tweet content, max 280 chars, required>",
-  "thread_continuation": ["<list of optional strings for a follow-up thread>"],
-  "hashtags": ["<list of relevant string hashtags>"]
-}}
-
-
-MANDATORY INSTRUCTIONS:
-
-    For an image_carousel, you MUST generate at least 4 slides.
-
-    Strictly Follow the Language Constraint in the style below.
-
-    Your entire output must be a single, valid JSON object that matches one of the schemas above.
-
-    Do NOT include content_id in your response.
-
-    The generated text must strictly follow this style: {style_text}
-"""
+    # Use the dynamic prompt generator with configurable limits
+    dynamic_system_prompt = get_system_prompt_generate_content(style_text)
+    
     for i, idea in enumerate(ideas, start=1):
         content_id = f"{video_id}_{i:03d}"
         console.log(f"Generating piece {i}/{len(ideas)}: '{idea.suggested_title}' (type: {idea.suggested_content_type})")
@@ -700,35 +661,85 @@ def save_other_content_to_csv(other_pieces: List[Union[Reel, Tweet]], output_csv
     except Exception as e:
         console.log(f"[red]Failed to save other content to CSV: {e}[/red]")
 
-def parse_input_source(input_source: str) -> List[str]:
-    video_ids = set()
+def parse_input_source(input_source: str) -> List[dict]:
+    """
+    Parse input source and return list of sources (videos or documents)
+    Returns list of dicts: {"type": "video"|"document", "value": video_id|file_path, "name": display_name}
+    """
+    sources = []
+    
     if os.path.isfile(input_source):
-        console.log(f":page_facing_up: Reading from file: [cyan]{input_source}[/cyan]")
         ext = os.path.splitext(input_source)[1].lower()
+        
+        # Check if it's a document file that should be processed directly
+        if DocumentParser.is_supported(input_source):
+            console.log(f"📄 Document file detected: [cyan]{input_source}[/cyan]")
+            sources.append({
+                "type": "document",
+                "value": input_source,
+                "name": os.path.basename(input_source)
+            })
+            return sources
+        
+        # Otherwise, it's a list file (CSV/TXT) containing video IDs
+        console.log(f"📄 Reading video list from: [cyan]{input_source}[/cyan]")
         try:
             if ext == '.csv':
                 df = pd.read_csv(input_source, dtype=str, keep_default_na=False)
                 col = 'video_id' if 'video_id' in df.columns else 'video_url'
                 for item in df[col].dropna():
                     vid = extract_video_id(item)
-                    if vid: video_ids.add(vid)
+                    if vid:
+                        sources.append({
+                            "type": "video",
+                            "value": vid,
+                            "name": vid
+                        })
             elif ext == '.txt':
                 with open(input_source, 'r', encoding='utf-8') as f:
                     for line in f:
-                        vid = extract_video_id(line.strip())
-                        if vid: video_ids.add(vid)
+                        line = line.strip()
+                        if not line or line.startswith('#'):
+                            continue
+                        vid = extract_video_id(line)
+                        if vid:
+                            sources.append({
+                                "type": "video",
+                                "value": vid,
+                                "name": vid
+                            })
         except Exception as e:
             console.log(f"[red]Error reading file {input_source}: {e}[/red]")
     else:
-        console.log(":keyboard: Reading from command-line argument.")
+        # Command-line argument (comma-separated video IDs/URLs)
+        console.log("⌨️  Reading from command-line argument")
         for item in input_source.split(','):
-            vid = extract_video_id(item.strip())
-            if vid: video_ids.add(vid)
-    return list(video_ids)
+            item = item.strip()
+            if not item:
+                continue
+            vid = extract_video_id(item)
+            if vid:
+                sources.append({
+                    "type": "video",
+                    "value": vid,
+                    "name": vid
+                })
+    
+    # Remove duplicates while preserving order
+    seen = set()
+    unique_sources = []
+    for source in sources:
+        key = (source["type"], source["value"])
+        if key not in seen:
+            seen.add(key)
+            unique_sources.append(source)
+    
+    return unique_sources
 
-def process_videos(video_ids: List[str]):
-    if not video_ids:
-        console.log("[yellow]No valid video IDs found to process.[/yellow]")
+def process_sources(sources: List[dict], content_config: Optional[Dict[str, Any]] = None):
+    """Process both video and document sources with optional configuration"""
+    if not sources:
+        console.log("[yellow]⚠ No sources found to process.[/yellow]")
         return
     
     summary = {"reels": 0, "tweets": 0, "carousels": 0}
@@ -738,92 +749,340 @@ def process_videos(video_ids: List[str]):
         TaskProgressColumn(), TextColumn("[{task.completed}/{task.total}]"), TimeElapsedColumn(),
         console=console, transient=True
     ) as progress:
-        main_task = progress.add_task("[cyan]Processing videos...[/]", total=len(video_ids))
-        for video_id in video_ids:
-            video_url = f"https://www.youtube.com/watch?v={video_id}"
-            video_title = get_video_title(video_id) or video_id
-            progress.update(main_task, description=f"Processing '{video_title[:35]}...'")
+        main_task = progress.add_task("[cyan]Processing sources...[/]", total=len(sources))
+        for idx, source in enumerate(sources, 1):
+            source_type = source["type"]
+            source_value = source["value"]
+            source_name = source["name"]
             
-            try:
-                transcript_text = get_transcript_text(video_id)
-            except Exception as e:
-                logger.error(f"Error fetching transcript for {video_id}: {e}")
-                transcript_text = None
+            console.print()
+            console.rule(f"[bold]Source {idx}/{len(sources)}[/]", style="dim")
+            
+            # Handle based on type
+            if source_type == "document":
+                # Process document
+                console.log(f"📄 Document: [bold]{source_name}[/]")
+                progress.update(main_task, description=f"[{idx}/{len(sources)}] {source_name[:30]}...")
+                
+                try:
+                    # Extract text from document
+                    console.log(f"[cyan]📖[/] Parsing document...")
+                    text, format_name = DocumentParser.parse_document(source_value)
+                    
+                    console.log(f"[green]✓[/] Extracted {len(text)} characters from {format_name}")
+                    
+                    # Use document text instead of transcript
+                    transcript_text = text
+                    video_title = source_name
+                    video_url = f"document://{source_name}"
+                    
+                except Exception as e:
+                    logger.error(f"Error parsing document {source_value}: {e}")
+                    console.log(f"[red]✗[/] Failed to parse document: {str(e)[:100]}")
+                    progress.update(main_task, advance=1)
+                    continue
+                    
+            else:  # video
+                # Process YouTube video
+                video_id = source_value
+                video_url = f"https://www.youtube.com/watch?v={video_id}"
+                console.log(f"🎥 Video ID: [bold]{video_id}[/]")
+                
+                try:
+                    video_title = get_video_title(video_id)
+                    if video_title:
+                        console.log(f"📝 Title: [bold]{video_title[:60]}{'...' if len(video_title) > 60 else ''}[/]")
+                        progress.update(main_task, description=f"[{idx}/{len(sources)}] {video_title[:30]}...")
+                    else:
+                        console.log(f"[dim]Title not available[/]")
+                        video_title = video_id
+                        progress.update(main_task, description=f"[{idx}/{len(sources)}] {video_id}")
+                except Exception as e:
+                    console.log(f"[yellow]⚠[/] Could not fetch title: {str(e)[:50]}")
+                    video_title = video_id
+                    progress.update(main_task, description=f"[{idx}/{len(sources)}] {video_id}")
+            
+            # Get transcript/text only for videos (already have text for documents)
+            if source_type == "video":
+                try:
+                    # Use enhanced transcript service with preferences
+                    preferences = TranscriptPreferences(
+                        prefer_manual=True,
+                        require_english=False,  # Allow non-English transcripts
+                        enable_translation=True,
+                        fallback_languages=["en", "es", "fr", "de", "hi", "ur"]
+                    )
+                    
+                    result = get_english_transcript(video_id, preferences)
+                    
+                    if result:
+                        transcript_text = result.transcript_text
+                        
+                        # Show transcript info
+                        lang_info = f"{result.language} ({result.language_code})"
+                        if result.is_translated:
+                            lang_info = f"Translated from {lang_info}"
+                        if result.is_generated:
+                            lang_info += " [auto-generated]"
+                        
+                        console.log(f"[green]✓[/] Transcript: {lang_info} - {len(transcript_text)} chars")
+                        
+                        # Show processing notes if any
+                        if result.processing_notes:
+                            for note in result.processing_notes:
+                                if "YouTube translation failed" in note or "original" in note.lower():
+                                    console.log(f"  [yellow]ℹ[/] {note}")
+                    else:
+                        transcript_text = None
+                        
+                except Exception as e:
+                    logger.error(f"Error fetching transcript for {video_id}: {e}")
+                    console.log(f"[red]✗[/] Failed to get transcript: {str(e)[:100]}")
+                    transcript_text = None
+                    
+                if not transcript_text or len(transcript_text) < 50:
+                    console.log(f"[yellow]⚠[/] Transcript is empty or too short. Skipping.")
+                    progress.update(main_task, advance=1)
+                    continue
+            
+            # Validate text content (applies to both videos and documents)
             if not transcript_text or len(transcript_text) < 50:
-                console.log(f"[yellow]Transcript for {video_id} is empty or too short. Skipping.[/yellow]")
+                console.log(f"[yellow]⚠[/] Content is empty or too short. Skipping.")
                 progress.update(main_task, advance=1)
                 continue
             
-            raw_ideas = generate_content_ideas(transcript_text)
+            console.log(f"[cyan]💡[/] Generating content ideas...")
+            raw_ideas = generate_content_ideas(transcript_text, content_config=content_config)
             if not raw_ideas:
-                # console.log is already called inside generate_content_ideas
+                console.log(f"[yellow]⚠[/] No ideas generated for {video_id}")
                 progress.update(main_task, advance=1)
                 continue
             
             try:
                 validated_ideas = GeneratedIdeas(ideas=raw_ideas).ideas
+                console.log(f"[green]✓[/] Generated {len(validated_ideas)} content idea(s)")
             except ValidationError as e:
-                console.log(f"[red]Failed to validate ideas for {video_id}: {e}[/red]")
+                console.log(f"[red]✗[/] Failed to validate ideas: {str(e)[:80]}...")
                 progress.update(main_task, advance=1)
                 continue
 
-            all_pieces = generate_specific_content_pieces(validated_ideas, transcript_text, video_url).pieces
+            console.log(f"[cyan]✨[/] Creating content pieces...")
+            all_pieces = generate_specific_content_pieces(validated_ideas, transcript_text, video_url, content_config=content_config).pieces
             if not all_pieces:
-                console.log(f"[yellow]No valid content pieces were generated for {video_id}.[/yellow]")
+                console.log(f"[yellow]⚠[/] No content pieces generated")
                 progress.update(main_task, advance=1)
                 continue
 
             carousels = [p for p in all_pieces if isinstance(p, ImageCarousel)]
             others = [p for p in all_pieces if not isinstance(p, ImageCarousel)]
             
+            pieces_summary = []
+            if carousels:
+                pieces_summary.append(f"{len(carousels)} carousel(s)")
+            reels_count = sum(1 for p in others if isinstance(p, Reel))
+            tweets_count = sum(1 for p in others if isinstance(p, Tweet))
+            if reels_count:
+                pieces_summary.append(f"{reels_count} reel(s)")
+            if tweets_count:
+                pieces_summary.append(f"{tweets_count} tweet(s)")
+            
+            console.log(f"[green]✓[/] Created: {', '.join(pieces_summary)}")
+            
             if carousels:
                 titles_csv = os.path.join(CAROUSELS_DIR, f"{video_id}_carousel_titles.csv")
-                console.log(f"Saving {len(carousels)} carousel(s) for [bold magenta]{video_id}[/bold magenta]:")
                 for carousel in carousels:
                     save_carousel_metadata(carousel, titles_csv, video_url)
-                console.log(f"  -> Saved metadata to [cyan]{os.path.basename(titles_csv)}[/cyan]")
                 for carousel in carousels:
                     save_carousel_slides(carousel, SLIDES_DIR)
                 summary["carousels"] += len(carousels)
+                console.log(f"  [dim]└─[/] Saved carousel metadata & slides")
                 
             if others:
                 save_other_content_to_csv(others, GENERATED_CONTENT_CSV, video_url, video_title)
-                summary["reels"] += sum(1 for p in others if isinstance(p, Reel))
-                summary["tweets"] += sum(1 for p in others if isinstance(p, Tweet))
+                summary["reels"] += reels_count
+                summary["tweets"] += tweets_count
+                console.log(f"  [dim]└─[/] Saved content to CSV")
 
             progress.update(main_task, advance=1)
 
-    console.rule("[bold green]Processing Complete[/bold green]")
-    console.print(f"Generated a total of:")
-    console.print(f"  - [bold blue]{summary['reels']}[/bold blue] Reels")
-    console.print(f"  - [bold cyan]{summary['tweets']}[/bold cyan] Tweets")
-    console.print(f"  - [bold magenta]{summary['carousels']}[/bold magenta] Image Carousels")
-    console.print(f"Check the '{OUTPUT_DIR}' directory for all generated files.")
+    console.print()
+    console.rule("[bold green]✓ Processing Complete[/]", style="green")
+    console.print()
+    
+    total_content = summary['reels'] + summary['tweets'] + summary['carousels']
+    
+    if total_content > 0:
+        console.print("📊 [bold]Generated Content:[/]")
+        if summary['reels'] > 0:
+            console.print(f"   🎬 [bold blue]{summary['reels']}[/] Reel(s)")
+        if summary['tweets'] > 0:
+            console.print(f"   🐦 [bold cyan]{summary['tweets']}[/] Tweet(s)")
+        if summary['carousels'] > 0:
+            console.print(f"   🖼️  [bold magenta]{summary['carousels']}[/] Image Carousel(s)")
+        
+        console.print()
+        console.print(f"📁 All files saved to: [cyan]{os.path.abspath(OUTPUT_DIR)}[/]")
+    else:
+        console.print("[yellow]⚠ No content was generated[/]")
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Generate short-form content from YouTube videos.")
-    parser.add_argument("input_source", help="Comma-separated URLs/IDs, or a path to a .txt/.csv file.")
-    parser.add_argument("-l", "--limit", type=int, help="Maximum number of videos to process.")
+    parser = argparse.ArgumentParser(
+        description="🎬 Content Repurposing Tool - Generate social media content from videos & documents",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  # Single video (uses enhanced defaults: 800 char slides)
+  python repurpose.py "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+  
+  # Multiple videos
+  python repurpose.py "dQw4w9WgXcQ,jNQXAC9IVRw"
+  
+  # Document file (TXT, MD, DOCX, PDF)
+  python repurpose.py article.pdf
+  python repurpose.py notes.md
+  
+  # Video list from file
+  python repurpose.py videos.txt
+  
+  # Limit processing
+  python repurpose.py videos.csv -l 5
+  
+  # Custom configuration: longer carousel slides
+  python repurpose.py video.txt --carousel-text-max 1000
+  
+  # More slides per carousel
+  python repurpose.py video.txt --carousel-slides-max 12
+  
+  # Generate more content ideas
+  python repurpose.py video.txt --min-ideas 10 --max-ideas 15
+  
+  # Show current configuration
+  python repurpose.py --show-config
+        """
+    )
+    parser.add_argument("input_source", nargs='?', help="Video URLs/IDs, document file (.txt/.md/.docx/.pdf), or list file")
+    parser.add_argument("-l", "--limit", type=int, metavar="N", help="Process only first N videos")
+    
+    # Configuration options
+    config_group = parser.add_argument_group('Configuration Options', 'Customize content generation settings')
+    config_group.add_argument("--carousel-text-max", type=int, metavar="N", 
+                            help=f"Max chars per carousel slide text (default: {DEFAULT_FIELD_LIMITS['carousel_slide_text_max']})")
+    config_group.add_argument("--carousel-slides-min", type=int, metavar="N",
+                            help=f"Min slides per carousel (default: {DEFAULT_FIELD_LIMITS['carousel_min_slides']})")
+    config_group.add_argument("--carousel-slides-max", type=int, metavar="N",
+                            help=f"Max slides per carousel (default: {DEFAULT_FIELD_LIMITS['carousel_max_slides']})")
+    config_group.add_argument("--min-ideas", type=int, metavar="N",
+                            help="Min content ideas to generate (default: 6)")
+    config_group.add_argument("--max-ideas", type=int, metavar="N",
+                            help="Max content ideas to generate (default: 8)")
+    config_group.add_argument("--show-config", action="store_true",
+                            help="Show current configuration and exit")
+    
     args = parser.parse_args()
+    
+    # Check if input_source is required
+    if not args.show_config and not args.input_source:
+        parser.error("input_source is required unless --show-config is used")
+    
+    # Handle show-config option
+    if args.show_config:
+        console.print("[bold]Current Configuration:[/]")
+        console.print()
+        console.print("[bold cyan]Carousel Settings:[/]")
+        console.print(f"  Slide Text Max:  {CURRENT_FIELD_LIMITS['carousel_slide_text_max']} chars")
+        console.print(f"  Min Slides:      {CURRENT_FIELD_LIMITS['carousel_min_slides']}")
+        console.print(f"  Max Slides:      {CURRENT_FIELD_LIMITS['carousel_max_slides']}")
+        console.print()
+        console.print("[bold cyan]Reel Settings:[/]")
+        console.print(f"  Script Max:      {CURRENT_FIELD_LIMITS['reel_script_max']} chars")
+        console.print(f"  Caption Max:     {CURRENT_FIELD_LIMITS['reel_caption_max']} chars")
+        console.print()
+        console.print("[bold cyan]Generation Settings:[/]")
+        console.print(f"  Min Ideas:       6")
+        console.print(f"  Max Ideas:       8")
+        console.print()
+        console.print("💡 [dim]Use --carousel-text-max, --carousel-slides-min, etc. to override[/]")
+        sys.exit(0)
+    
+    # Build content config from CLI arguments
+    cli_content_config = {}
+    cli_field_limits = {}
+    
+    if args.carousel_text_max:
+        cli_field_limits['carousel_slide_text_max'] = args.carousel_text_max
+    if args.carousel_slides_min:
+        cli_field_limits['carousel_min_slides'] = args.carousel_slides_min
+    if args.carousel_slides_max:
+        cli_field_limits['carousel_max_slides'] = args.carousel_slides_max
+    
+    if cli_field_limits:
+        cli_content_config['field_limits'] = cli_field_limits
+    
+    if args.min_ideas:
+        cli_content_config['min_ideas'] = args.min_ideas
+    if args.max_ideas:
+        cli_content_config['max_ideas'] = args.max_ideas
 
-    console.rule("[bold blue]YouTube Content Repurposing Script[/]", style="blue")
-    console.print(f"Output (Other Content): [cyan]{os.path.abspath(GENERATED_CONTENT_CSV)}[/cyan]")
-    console.print(f"Output (Carousels):     [cyan]{os.path.abspath(CAROUSELS_DIR)}[/cyan]")
-    console.print(f"Output (Slides):        [cyan]{os.path.abspath(SLIDES_DIR)}[/cyan]")
+    console.rule("[bold blue]🎬 Content Repurposing Tool[/]", style="blue")
+    console.print()
+    console.print("📁 [bold]Output Directories:[/]")
+    console.print(f"   └─ Content: [cyan]{os.path.abspath(GENERATED_CONTENT_CSV)}[/cyan]")
+    console.print(f"   └─ Carousels: [cyan]{os.path.abspath(CAROUSELS_DIR)}[/cyan]")
+    console.print(f"   └─ Slides: [cyan]{os.path.abspath(SLIDES_DIR)}[/cyan]")
+    console.print()
     
     start_time = time.time()
     try:
-        video_ids = parse_input_source(args.input_source)
-        if args.limit is not None:
-            video_ids = video_ids[:args.limit]
-            console.print(f"Processing limit: [yellow]First {len(video_ids)} videos.[/yellow]")
+        console.print("🔍 [bold]Parsing input...[/]")
+        sources = parse_input_source(args.input_source)
         
-        process_videos(video_ids)
+        if not sources:
+            console.print("[yellow]⚠ No sources found to process.[/]")
+            sys.exit(0)
+        
+        # Count by type
+        video_count = sum(1 for s in sources if s["type"] == "video")
+        doc_count = sum(1 for s in sources if s["type"] == "document")
+        
+        if video_count and doc_count:
+            console.print(f"✓ Found [bold green]{len(sources)}[/] sources: {video_count} video(s), {doc_count} document(s)")
+        elif video_count:
+            console.print(f"✓ Found [bold green]{video_count}[/] video(s)")
+        else:
+            console.print(f"✓ Found [bold green]{doc_count}[/] document(s)")
+        
+        if args.limit is not None:
+            sources = sources[:args.limit]
+            console.print(f"⚙️  Limiting to first [yellow]{len(sources)}[/] source(s)")
+        
+        # Show configuration if custom settings provided
+        if cli_content_config:
+            console.print()
+            console.print("⚙️  [bold]Custom Configuration:[/]")
+            if 'field_limits' in cli_content_config:
+                for key, value in cli_content_config['field_limits'].items():
+                    console.print(f"   • {key}: {value}")
+            if 'min_ideas' in cli_content_config:
+                console.print(f"   • min_ideas: {cli_content_config['min_ideas']}")
+            if 'max_ideas' in cli_content_config:
+                console.print(f"   • max_ideas: {cli_content_config['max_ideas']}")
+        
+        console.print()
+        console.rule("[dim]Starting Processing[/]", style="dim")
+        console.print()
+        
+        process_sources(sources, content_config=cli_content_config if cli_content_config else None)
 
+    except KeyboardInterrupt:
+        console.print("\n\n[yellow]⚠ Interrupted by user[/]")
+        logger.info("Script interrupted by user (Ctrl+C)")
     except Exception as e:
         console.print(f"\n[bold red]❌ Critical error: {e}[/bold red]")
         logger.critical("Critical unhandled error during script execution.", exc_info=True)
+        sys.exit(1)
     finally:
         duration = time.time() - start_time
-        console.print(f"\n[bold]🏁 Finished in {duration:.2f} seconds.[/bold]")
-        console.rule(style="blue")
+        console.print()
+        console.rule(style="dim")
+        console.print(f"[bold green]✓[/] Completed in [cyan]{duration:.2f}s[/]")
+        console.rule("[bold blue]🏁 Finished[/]", style="blue")

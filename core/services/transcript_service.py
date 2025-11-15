@@ -161,12 +161,21 @@ def list_available_transcripts_with_metadata(video_id: str) -> List[TranscriptMe
         
         metadata_list = []
         for transcript in transcript_list:
+            # Extract translation language codes properly
+            translation_langs = []
+            if hasattr(transcript, 'translation_languages'):
+                for lang in transcript.translation_languages:
+                    if hasattr(lang, 'language_code'):
+                        translation_langs.append(lang.language_code)
+                    elif isinstance(lang, str):
+                        translation_langs.append(lang)
+            
             metadata = TranscriptMetadata(
                 language_code=transcript.language_code,
                 language=transcript.language,
                 is_generated=transcript.is_generated,
                 is_translatable=transcript.is_translatable,
-                translation_languages=transcript.translation_languages if hasattr(transcript, 'translation_languages') else []
+                translation_languages=translation_langs
             )
             metadata_list.append(metadata)
             
@@ -205,17 +214,15 @@ def find_best_english_transcript_source(video_id: str, preferences: Optional[Tra
             for transcript in transcript_list:
                 if (not transcript.is_generated and 
                     transcript.language_code.lower() != 'en' and 
-                    transcript.is_translatable and
                     preferences.prefer_manual):
-                    logging.info(f"Found manual {transcript.language} transcript for translation for {video_id}")
+                    logging.info(f"Found manual {transcript.language} transcript for {video_id} (translatable: {transcript.is_translatable})")
                     return transcript
         
             # Priority 4: Auto-generated non-English transcript (if translation enabled)
             for transcript in transcript_list:
                 if (transcript.is_generated and 
-                    transcript.language_code.lower() != 'en' and 
-                    transcript.is_translatable):
-                    logging.info(f"Found auto-generated {transcript.language} transcript for translation for {video_id}")
+                    transcript.language_code.lower() != 'en'):
+                    logging.info(f"Found auto-generated {transcript.language} transcript for {video_id} (translatable: {transcript.is_translatable})")
                     return transcript
         
         logging.warning(f"No suitable transcript found for {video_id}")
@@ -364,9 +371,9 @@ def get_english_transcript(video_id: str, preferences: Optional[TranscriptPrefer
                 
             except Exception as translation_error:
                 logging.error(f"Translation failed for {video_id}: {translation_error}")
-                if preferences.require_english:
-                    return None
-                processing_notes.append(f"Translation failed, using original {best_transcript.language} text")
+                # Use original transcript even if translation fails - LLM can handle it
+                processing_notes.append(f"YouTube translation failed, using original {best_transcript.language} text - will be handled by LLM")
+                needs_translation = False  # Mark as not translated since we're using original
         
         # Cache final English transcript
         if db_session and (not needs_translation or (needs_translation and 'Translation failed' not in processing_notes[-1] if processing_notes else True)):

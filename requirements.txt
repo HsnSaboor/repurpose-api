@@ -28,6 +28,14 @@ youtube-comment-downloader
 # Utilities
 pandas
 rich
+
+# Document Parsing
+pypdf
+python-docx
+markdown2
+chardet
+python-multipart
+
 # Testing
 pytest
 requests

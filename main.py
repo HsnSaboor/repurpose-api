@@ -1,5 +1,5 @@
 import logging
-from fastapi import FastAPI, HTTPException, Depends, Query
+from fastapi import FastAPI, HTTPException, Depends, Query, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, HttpUrl, ValidationError, Field, root_validator
@@ -16,6 +16,7 @@ from core.services.transcript_service import (
     list_available_transcripts_with_metadata,
     get_transcript_text
 )
+from core.services.document_service import DocumentParser, extract_text_from_document
 from repurpose import (
     generate_content_ideas,
     generate_specific_content_pieces,
@@ -40,6 +41,35 @@ import time
 
 print("DEBUG: main.py top-level print statement executed.")
 
+# Content Field Configuration Models
+class ContentFieldLimits(BaseModel):
+    """Configuration for field length limits per content type"""
+    # Reel fields
+    reel_title_max: int = Field(100, description="Max length for reel titles")
+    reel_caption_max: int = Field(300, description="Max length for reel captions")
+    reel_hook_max: int = Field(200, description="Max length for reel hooks")
+    reel_script_max: int = Field(2000, description="Max length for reel scripts")
+    
+    # Carousel fields
+    carousel_title_max: int = Field(100, description="Max length for carousel titles")
+    carousel_caption_max: int = Field(300, description="Max length for carousel captions")
+    carousel_slide_heading_max: int = Field(100, description="Max length for carousel slide headings")
+    carousel_slide_text_max: int = Field(800, description="Max length for carousel slide text (detailed content)")
+    carousel_min_slides: int = Field(4, description="Minimum number of slides in carousel")
+    carousel_max_slides: int = Field(8, description="Maximum number of slides in carousel")
+    
+    # Tweet fields
+    tweet_title_max: int = Field(100, description="Max length for tweet titles")
+    tweet_text_max: int = Field(280, description="Max length for tweet text")
+    tweet_thread_item_max: int = Field(280, description="Max length for thread continuation items")
+
+class ContentGenerationConfig(BaseModel):
+    """Configuration for content generation behavior"""
+    min_ideas: int = Field(6, description="Minimum number of content ideas to generate")
+    max_ideas: int = Field(8, description="Maximum number of content ideas to generate")
+    content_pieces_per_idea: int = Field(1, description="Number of content pieces per idea")
+    field_limits: ContentFieldLimits = Field(default_factory=ContentFieldLimits, description="Field length limits")
+
 # Content Style Models
 class ContentStylePreset(BaseModel):
     name: str = Field(..., description="Name of the content style preset")
@@ -50,6 +80,7 @@ class ContentStylePreset(BaseModel):
     language: str = Field("English", description="Language for content generation")
     tone: str = Field("Professional", description="Tone of the content (Professional, Casual, Humorous, etc.)")
     additional_instructions: Optional[str] = Field(None, description="Additional style instructions")
+    content_config: ContentGenerationConfig = Field(default_factory=ContentGenerationConfig, description="Content generation configuration")
 
 class CustomContentStyle(BaseModel):
     target_audience: str = Field(..., description="Target audience for the content")
@@ -58,6 +89,7 @@ class CustomContentStyle(BaseModel):
     language: str = Field("English", description="Language for content generation")
     tone: str = Field("Professional", description="Tone of the content")
     additional_instructions: Optional[str] = Field(None, description="Additional style instructions")
+    content_config: Optional[ContentGenerationConfig] = Field(None, description="Content generation configuration")
 
 # Request/Response Models
 class TranscribeRequest(BaseModel):
@@ -316,7 +348,7 @@ async def process_video_stream(request: ProcessVideoRequest, db: Session = Depen
             
             # Get English transcript with enhanced service
             try:
-                result = await loop.run_in_executor(
+                result = await asyncio.get_event_loop().run_in_executor(
                     executor, 
                     get_english_transcript, 
                     request.video_id, 
@@ -353,13 +385,22 @@ async def process_video_stream(request: ProcessVideoRequest, db: Session = Depen
             
             yield f"data: {{\"status\": \"generating_content\", \"message\": \"Generating content ideas...\", \"progress\": 60}}\n\n"
             
+            # Prepare content config
+            content_config_dict = None
+            if request.custom_style and request.custom_style.content_config:
+                content_config_dict = request.custom_style.content_config.model_dump()
+            elif request.style_preset and request.style_preset in CONTENT_STYLE_PRESETS:
+                preset = CONTENT_STYLE_PRESETS[request.style_preset]
+                content_config_dict = preset.content_config.model_dump()
+            
             # Generate content
             ideas_raw = await asyncio.get_event_loop().run_in_executor(
                 executor,
                 generate_content_ideas,
                 transcript,
                 request.style_preset,
-                request.custom_style.dict() if request.custom_style else None
+                request.custom_style.dict() if request.custom_style else None,
+                content_config_dict
             )
             
             if not ideas_raw:
@@ -383,7 +424,8 @@ async def process_video_stream(request: ProcessVideoRequest, db: Session = Depen
                 transcript,
                 f"https://youtube.com/watch?v={request.video_id}",
                 request.style_preset,
-                request.custom_style.dict() if request.custom_style else None
+                request.custom_style.dict() if request.custom_style else None,
+                content_config_dict
             )
             
             yield f"data: {{\"status\": \"content_generated\", \"message\": \"Content pieces generated successfully\", \"progress\": 90}}\n\n"
@@ -477,7 +519,7 @@ async def get_all_videos(skip: int = 0, limit: int = 100, db: Session = Depends(
         raise HTTPException(status_code=500, detail=f"Failed to fetch videos: {str(e)}")
 @app.get("/content-styles/presets/{preset_name}")
 async def get_style_preset(preset_name: str):
-    """Get details of a specific content style preset"""
+    """Get details of a specific content style preset including content configuration"""
     if preset_name not in CONTENT_STYLE_PRESETS:
         raise HTTPException(status_code=404, detail=f"Style preset '{preset_name}' not found")
     
@@ -490,7 +532,33 @@ async def get_style_preset(preset_name: str):
         "content_goal": preset.content_goal,
         "language": preset.language,
         "tone": preset.tone,
-        "additional_instructions": preset.additional_instructions
+        "additional_instructions": preset.additional_instructions,
+        "content_config": preset.content_config.model_dump()
+    }
+
+@app.get("/content-config/default")
+async def get_default_content_config():
+    """Get the default content generation configuration including field limits"""
+    from repurpose import DEFAULT_FIELD_LIMITS
+    
+    return {
+        "description": "Default configuration for content generation",
+        "field_limits": DEFAULT_FIELD_LIMITS,
+        "min_ideas": 6,
+        "max_ideas": 8,
+        "content_pieces_per_idea": 1,
+        "note": "These are the default settings. You can override them in custom_style.content_config when processing videos/documents."
+    }
+
+@app.get("/content-config/current")
+async def get_current_content_config():
+    """Get the currently active content generation configuration"""
+    from repurpose import CURRENT_FIELD_LIMITS
+    
+    return {
+        "description": "Currently active configuration for content generation",
+        "field_limits": CURRENT_FIELD_LIMITS,
+        "note": "This shows the active configuration. To use custom limits, pass them in the content_config parameter when processing."
     }
 @app.on_event("startup")
 async def on_startup():
@@ -771,6 +839,8 @@ async def process_video(
             # Prepare style parameters for content generation
             style_preset = request.style_preset
             custom_style_dict = None
+            content_config_dict = None
+            
             if request.custom_style:
                 custom_style_dict = {
                     'target_audience': request.custom_style.target_audience,
@@ -780,8 +850,16 @@ async def process_video(
                     'tone': request.custom_style.tone,
                     'additional_instructions': request.custom_style.additional_instructions
                 }
+                # Extract content config from custom style if present
+                if request.custom_style.content_config:
+                    content_config_dict = request.custom_style.content_config.model_dump()
+            
+            # If using preset, get content config from preset
+            elif style_preset and style_preset in CONTENT_STYLE_PRESETS:
+                preset = CONTENT_STYLE_PRESETS[style_preset]
+                content_config_dict = preset.content_config.model_dump()
 
-            ideas_data_raw = await loop.run_in_executor(executor, generate_content_ideas, db_video.transcript, style_preset, custom_style_dict)
+            ideas_data_raw = await loop.run_in_executor(executor, generate_content_ideas, db_video.transcript, style_preset, custom_style_dict, content_config_dict)
             if ideas_data_raw is None:
                 logging.error(f"Failed to generate content ideas for video ID {db_video.youtube_video_id}.")
                 raise HTTPException(status_code=500, detail=f"Failed to generate content ideas for video ID '{db_video.youtube_video_id}'.")
@@ -813,7 +891,8 @@ async def process_video(
                 db_video.transcript,
                 video_url_to_pass,
                 style_preset,
-                custom_style_dict
+                custom_style_dict,
+                content_config_dict
             )
 
             if content_pieces_data_obj is None or not hasattr(content_pieces_data_obj, 'pieces'):
@@ -1167,3 +1246,386 @@ async def analyze_available_transcripts(video_id: str):
     except Exception as e:
         logging.exception(f"Error analyzing transcripts for {video_id}: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to analyze transcripts: {str(e)}")
+
+# ==================== Document Processing Endpoints ====================
+
+@app.post("/process-document/", response_model=ProcessVideoResponse)
+async def process_document(
+    file: UploadFile = File(...),
+    force_regenerate: bool = Form(False),
+    style_preset: Optional[str] = Form(None),
+    custom_style: Optional[str] = Form(None),
+    db: Session = Depends(get_db)
+):
+    """
+    Process a document file (TXT, MD, DOCX, PDF) and generate social media content
+    
+    Upload a document and get content ideas and pieces generated from its text.
+    Works the same as video processing but with document input.
+    """
+    import tempfile
+    import os
+    
+    # Validate file extension
+    file_ext = os.path.splitext(file.filename)[1].lower()
+    if file_ext not in DocumentParser.SUPPORTED_EXTENSIONS:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Unsupported file format: {file_ext}. Supported: {', '.join(DocumentParser.SUPPORTED_EXTENSIONS)}"
+        )
+    
+    # Save uploaded file temporarily
+    with tempfile.NamedTemporaryFile(delete=False, suffix=file_ext) as temp_file:
+        content = await file.read()
+        temp_file.write(content)
+        temp_file_path = temp_file.name
+    
+    try:
+        # Extract text from document
+        loop = asyncio.get_event_loop()
+        text, format_name = await loop.run_in_executor(
+            executor,
+            DocumentParser.parse_document,
+            temp_file_path
+        )
+        
+        # Use filename without extension as "video_id" for database
+        doc_id = os.path.splitext(file.filename)[0].replace(' ', '_')[:50]
+        
+        # Check if document already processed
+        db_video = db.query(Video).filter(Video.youtube_video_id == doc_id).first()
+        
+        if db_video and not force_regenerate:
+            # Return existing processed content
+            video_data = {
+                "id": db_video.id,
+                "youtube_video_id": db_video.youtube_video_id,
+                "title": db_video.title or file.filename,
+                "transcript": db_video.transcript,
+                "status": db_video.status,
+                "ideas": [],
+                "content_pieces": []
+            }
+            
+            try:
+                if db_video.repurposed_text:
+                    repurposed_data = json.loads(db_video.repurposed_text)
+                    video_data["ideas"] = repurposed_data.get("ideas", [])
+                    video_data["content_pieces"] = repurposed_data.get("content_pieces", [])
+            except:
+                pass
+            
+            return video_data
+        
+        # Parse custom style if provided
+        custom_style_dict = None
+        content_config_dict = None
+        
+        if custom_style:
+            try:
+                custom_style_dict = json.loads(custom_style)
+                # Extract content config if present
+                if 'content_config' in custom_style_dict:
+                    content_config_dict = custom_style_dict['content_config']
+            except json.JSONDecodeError:
+                raise HTTPException(status_code=400, detail="Invalid JSON in custom_style")
+        elif style_preset:
+            if style_preset not in CONTENT_STYLE_PRESETS:
+                raise HTTPException(status_code=404, detail=f"Style preset '{style_preset}' not found")
+            # Get content config from preset
+            preset = CONTENT_STYLE_PRESETS[style_preset]
+            content_config_dict = preset.content_config.model_dump()
+        
+        # Generate content ideas (uses either preset name or custom dict)
+        ideas_raw = await loop.run_in_executor(
+            executor,
+            generate_content_ideas,
+            text,
+            style_preset,
+            custom_style_dict,
+            content_config_dict
+        )
+        
+        if not ideas_raw:
+            raise HTTPException(status_code=500, detail="Failed to generate content ideas")
+        
+        # Convert dict ideas to ContentIdea objects if needed
+        if ideas_raw and isinstance(ideas_raw[0], dict):
+            ideas_raw = [ContentIdea(**idea) for idea in ideas_raw]
+        
+        # Generate specific content pieces
+        generated_content = await loop.run_in_executor(
+            executor,
+            generate_specific_content_pieces,
+            ideas_raw,
+            text,
+            f"document://{file.filename}",
+            style_preset,
+            custom_style_dict,
+            content_config_dict
+        )
+        
+        all_pieces = generated_content.pieces if hasattr(generated_content, 'pieces') else []
+        
+        # Prepare data for storage - convert Pydantic models to dicts
+        ideas_list = []
+        for idea in ideas_raw:
+            if hasattr(idea, 'dict'):
+                ideas_list.append(idea.dict())
+            elif isinstance(idea, dict):
+                ideas_list.append(idea)
+            else:
+                ideas_list.append(str(idea))
+        
+        pieces_list = []
+        for p in all_pieces:
+            if hasattr(p, 'dict'):
+                pieces_list.append(p.dict())
+            elif isinstance(p, dict):
+                pieces_list.append(p)
+            else:
+                pieces_list.append(str(p))
+        
+        repurposed_data = {
+            "ideas": ideas_list,
+            "content_pieces": pieces_list
+        }
+        
+        # Save or update in database
+        if db_video:
+            db_video.title = file.filename
+            db_video.transcript = text
+            db_video.repurposed_text = json.dumps(repurposed_data)
+            db_video.status = "completed"
+        else:
+            db_video = Video(
+                youtube_video_id=doc_id,
+                title=file.filename,
+                transcript=text,
+                repurposed_text=json.dumps(repurposed_data),
+                status="completed"
+            )
+            db.add(db_video)
+        
+        db.commit()
+        db.refresh(db_video)
+        
+        return {
+            "id": db_video.id,
+            "youtube_video_id": db_video.youtube_video_id,
+            "title": db_video.title,
+            "transcript": db_video.transcript,
+            "status": "completed",
+            "ideas": ideas_list,
+            "content_pieces": pieces_list
+        }
+        
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        logging.exception(f"Error processing document {file.filename}: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to process document: {str(e)}")
+    finally:
+        # Clean up temp file
+        try:
+            os.unlink(temp_file_path)
+        except:
+            pass
+
+
+@app.post("/process-document-stream/")
+async def process_document_stream(
+    file: UploadFile = File(...),
+    force_regenerate: bool = Form(False),
+    style_preset: Optional[str] = Form(None),
+    custom_style: Optional[str] = Form(None),
+    db: Session = Depends(get_db)
+):
+    """
+    Process a document with real-time streaming updates (SSE)
+    
+    Same as /process-document/ but returns Server-Sent Events for progress tracking
+    """
+    import tempfile
+    import os
+    
+    async def generate_stream():
+        temp_file_path = None
+        try:
+            yield f"data: {{\"status\": \"started\", \"message\": \"Processing document...\", \"progress\": 0}}\n\n"
+            
+            # Validate file
+            file_ext = os.path.splitext(file.filename)[1].lower()
+            if file_ext not in DocumentParser.SUPPORTED_EXTENSIONS:
+                yield f"data: {{\"status\": \"error\", \"message\": \"Unsupported file format: {file_ext}\", \"progress\": 0}}\n\n"
+                return
+            
+            yield f"data: {{\"status\": \"uploading\", \"message\": \"Reading file: {file.filename}\", \"progress\": 10}}\n\n"
+            
+            # Save file temporarily
+            with tempfile.NamedTemporaryFile(delete=False, suffix=file_ext) as temp_file:
+                content = await file.read()
+                temp_file.write(content)
+                temp_file_path = temp_file.name
+            
+            yield f"data: {{\"status\": \"parsing\", \"message\": \"Extracting text from {file_ext} file...\", \"progress\": 30}}\n\n"
+            
+            # Extract text
+            loop = asyncio.get_event_loop()
+            text, format_name = await loop.run_in_executor(
+                executor,
+                DocumentParser.parse_document,
+                temp_file_path
+            )
+            
+            char_count = len(text)
+            yield f"data: {{\"status\": \"text_extracted\", \"message\": \"Extracted {char_count} characters from {format_name}\", \"progress\": 50}}\n\n"
+            
+            doc_id = os.path.splitext(file.filename)[0].replace(' ', '_')[:50]
+            
+            # Check existing
+            db_video = db.query(Video).filter(Video.youtube_video_id == doc_id).first()
+            
+            if db_video and not force_regenerate:
+                yield f"data: {{\"status\": \"found_existing\", \"message\": \"Found existing processed document\", \"progress\": 60}}\n\n"
+                
+                video_data = {
+                    "id": db_video.id,
+                    "youtube_video_id": db_video.youtube_video_id,
+                    "title": db_video.title,
+                    "transcript": db_video.transcript,
+                    "status": db_video.status,
+                    "ideas": [],
+                    "content_pieces": []
+                }
+                
+                try:
+                    if db_video.repurposed_text:
+                        repurposed_data = json.loads(db_video.repurposed_text)
+                        video_data["ideas"] = repurposed_data.get("ideas", [])
+                        video_data["content_pieces"] = repurposed_data.get("content_pieces", [])
+                except:
+                    pass
+                
+                yield f"data: {{\"status\": \"complete\", \"progress\": 100, \"data\": {json.dumps(video_data)}}}\n\n"
+                return
+            
+            yield f"data: {{\"status\": \"generating_content\", \"message\": \"Generating content ideas...\", \"progress\": 60}}\n\n"
+            
+            # Parse style and content config
+            custom_style_dict = None
+            content_config_dict = None
+            
+            if custom_style:
+                try:
+                    custom_style_dict = json.loads(custom_style)
+                    if 'content_config' in custom_style_dict:
+                        content_config_dict = custom_style_dict['content_config']
+                except:
+                    pass
+            elif style_preset and style_preset in CONTENT_STYLE_PRESETS:
+                preset = CONTENT_STYLE_PRESETS[style_preset]
+                content_config_dict = preset.content_config.model_dump()
+            
+            # Generate ideas
+            ideas_raw = await loop.run_in_executor(
+                executor,
+                generate_content_ideas,
+                text,
+                style_preset,
+                custom_style_dict,
+                content_config_dict
+            )
+            
+            if not ideas_raw:
+                yield f"data: {{\"status\": \"error\", \"message\": \"Failed to generate ideas\", \"progress\": 60}}\n\n"
+                return
+            
+            yield f"data: {{\"status\": \"ideas_generated\", \"message\": \"Generated {len(ideas_raw)} content ideas\", \"progress\": 75}}\n\n"
+            
+            # Convert dict ideas to ContentIdea objects if needed
+            if ideas_raw and isinstance(ideas_raw[0], dict):
+                ideas_raw = [ContentIdea(**idea) for idea in ideas_raw]
+            
+            # Generate pieces
+            generated_content = await loop.run_in_executor(
+                executor,
+                generate_specific_content_pieces,
+                ideas_raw,
+                text,
+                f"document://{file.filename}",
+                style_preset,
+                custom_style_dict,
+                content_config_dict
+            )
+            
+            all_pieces = generated_content.pieces if hasattr(generated_content, 'pieces') else []
+            
+            yield f"data: {{\"status\": \"content_generated\", \"message\": \"Created {len(all_pieces)} content pieces\", \"progress\": 90}}\n\n"
+            
+            # Prepare data for storage - convert Pydantic models to dicts
+            ideas_list = []
+            for idea in ideas_raw:
+                if hasattr(idea, 'dict'):
+                    ideas_list.append(idea.dict())
+                elif isinstance(idea, dict):
+                    ideas_list.append(idea)
+                else:
+                    ideas_list.append(str(idea))
+            
+            pieces_list = []
+            for p in all_pieces:
+                if hasattr(p, 'dict'):
+                    pieces_list.append(p.dict())
+                elif isinstance(p, dict):
+                    pieces_list.append(p)
+                else:
+                    pieces_list.append(str(p))
+            
+            repurposed_data = {
+                "ideas": ideas_list,
+                "content_pieces": pieces_list
+            }
+            
+            # Save to database
+            if db_video:
+                db_video.title = file.filename
+                db_video.transcript = text
+                db_video.repurposed_text = json.dumps(repurposed_data)
+                db_video.status = "completed"
+            else:
+                db_video = Video(
+                    youtube_video_id=doc_id,
+                    title=file.filename,
+                    transcript=text,
+                    repurposed_text=json.dumps(repurposed_data),
+                    status="completed"
+                )
+                db.add(db_video)
+            
+            db.commit()
+            db.refresh(db_video)
+            
+            video_data = {
+                "id": db_video.id,
+                "youtube_video_id": db_video.youtube_video_id,
+                "title": db_video.title,
+                "transcript": db_video.transcript,
+                "status": "completed",
+                "ideas": ideas_list,
+                "content_pieces": pieces_list
+            }
+            
+            yield f"data: {{\"status\": \"complete\", \"progress\": 100, \"data\": {json.dumps(video_data)}}}\n\n"
+            
+        except Exception as e:
+            logging.exception(f"Error in document streaming: {str(e)}")
+            yield f"data: {{\"status\": \"error\", \"message\": \"Error: {str(e)[:100]}\", \"progress\": 0}}\n\n"
+        finally:
+            if temp_file_path:
+                try:
+                    os.unlink(temp_file_path)
+                except:
+                    pass
+    
+    return StreamingResponse(generate_stream(), media_type="text/event-stream")
