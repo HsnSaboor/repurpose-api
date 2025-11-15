@@ -1,256 +1,76 @@
+"""
+FastAPI Application - Content Repurposer API
+Streamlined with modular imports
+"""
+
 import logging
-from fastapi import FastAPI, HTTPException, Depends, Query, UploadFile, File, Form
+from fastapi import FastAPI, HTTPException, Depends, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
-from pydantic import BaseModel, HttpUrl, ValidationError, Field, root_validator
 from sqlalchemy.orm import Session
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
-from typing import Optional, List, Dict, Any, Union, Literal
-from core.database import init_db, SessionLocal, Video, TranscriptCache
-from youtube_transcript_api import YouTubeTranscriptApi
+from typing import Optional, List, Dict, Any
+import json
+import time
+
+# Import models from api module
+from api.models import (
+    TranscribeRequest, TranscriptResponse,
+    EnhancedTranscriptResponse, TranscriptAnalysisResponse,
+    ProcessVideoRequest, ProcessVideoResponse,
+    BulkVideoProcessRequest, BulkVideoProcessResponseItem,
+    EditContentRequest, EditContentResponse
+)
+
+# Import config
+from api.config import CONTENT_STYLE_PRESETS, get_content_style_prompt
+
+# Import database
+from core.database import init_db, SessionLocal, Video
+
+# Import services
 from core.services.transcript_service import (
-    get_english_transcript, 
-    TranscriptPreferences, 
-    EnglishTranscriptResult,
+    get_english_transcript,
+    TranscriptPreferences,
     list_available_transcripts_with_metadata,
     get_transcript_text
 )
 from core.services.document_service import DocumentParser, extract_text_from_document
+from core.services.video_service import get_video_title
+
+# Import content generation
 from repurpose import (
     generate_content_ideas,
     generate_specific_content_pieces,
     ContentIdea,
     GeneratedIdeas,
-    GeneratedContentList,
     extract_video_id as repurpose_extract_video_id,
-    get_video_title,
-    Reel,
-    ImageCarousel,
-    Tweet,
-    ContentType,
     edit_content_piece_with_diff,
     identify_content_changes
 )
-from channelvideos_alt import get_channel_videos
-import ast
-import json
-import requests
-import logging
-import time
 
 print("DEBUG: main.py top-level print statement executed.")
 
-# Content Field Configuration Models
-class ContentFieldLimits(BaseModel):
-    """Configuration for field length limits per content type"""
-    # Reel fields
-    reel_title_max: int = Field(100, description="Max length for reel titles")
-    reel_caption_max: int = Field(300, description="Max length for reel captions")
-    reel_hook_max: int = Field(200, description="Max length for reel hooks")
-    reel_script_max: int = Field(2000, description="Max length for reel scripts")
-    
-    # Carousel fields
-    carousel_title_max: int = Field(100, description="Max length for carousel titles")
-    carousel_caption_max: int = Field(300, description="Max length for carousel captions")
-    carousel_slide_heading_max: int = Field(100, description="Max length for carousel slide headings")
-    carousel_slide_text_max: int = Field(800, description="Max length for carousel slide text (detailed content)")
-    carousel_min_slides: int = Field(4, description="Minimum number of slides in carousel")
-    carousel_max_slides: int = Field(8, description="Maximum number of slides in carousel")
-    
-    # Tweet fields
-    tweet_title_max: int = Field(100, description="Max length for tweet titles")
-    tweet_text_max: int = Field(280, description="Max length for tweet text")
-    tweet_thread_item_max: int = Field(280, description="Max length for thread continuation items")
+# Initialize FastAPI app
+app = FastAPI(
+    title="Content Repurposer API",
+    description="Transform YouTube videos and documents into social media content",
+    version="0.2.0"
+)
 
-class ContentGenerationConfig(BaseModel):
-    """Configuration for content generation behavior"""
-    min_ideas: int = Field(6, description="Minimum number of content ideas to generate")
-    max_ideas: int = Field(8, description="Maximum number of content ideas to generate")
-    content_pieces_per_idea: int = Field(1, description="Number of content pieces per idea")
-    field_limits: ContentFieldLimits = Field(default_factory=ContentFieldLimits, description="Field length limits")
+# CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-# Content Style Models
-class ContentStylePreset(BaseModel):
-    name: str = Field(..., description="Name of the content style preset")
-    description: str = Field(..., description="Description of the style")
-    target_audience: str = Field(..., description="Target audience for the content")
-    call_to_action: str = Field(..., description="Call to action to include")
-    content_goal: str = Field(..., description="Goal of the content (education, lead_generation, etc.)")
-    language: str = Field("English", description="Language for content generation")
-    tone: str = Field("Professional", description="Tone of the content (Professional, Casual, Humorous, etc.)")
-    additional_instructions: Optional[str] = Field(None, description="Additional style instructions")
-    content_config: ContentGenerationConfig = Field(default_factory=ContentGenerationConfig, description="Content generation configuration")
+executor = ThreadPoolExecutor(max_workers=10)
 
-class CustomContentStyle(BaseModel):
-    target_audience: str = Field(..., description="Target audience for the content")
-    call_to_action: str = Field(..., description="Call to action to include")
-    content_goal: str = Field(..., description="Goal of the content")
-    language: str = Field("English", description="Language for content generation")
-    tone: str = Field("Professional", description="Tone of the content")
-    additional_instructions: Optional[str] = Field(None, description="Additional style instructions")
-    content_config: Optional[ContentGenerationConfig] = Field(None, description="Content generation configuration")
-
-# Request/Response Models
-class TranscribeRequest(BaseModel):
-    video_id: str = Field(..., description="The YouTube video ID of the video to transcribe.")
-    preferences: Optional[Dict[str, Any]] = Field(None, description="Transcript preferences for English processing")
-
-class TranscriptResponse(BaseModel):
-    youtube_video_id: str
-    title: Optional[str] = None
-    transcript: str
-    status: Optional[str] = None
-
-class EnhancedTranscriptResponse(BaseModel):
-    youtube_video_id: str
-    title: Optional[str] = None
-    transcript: str
-    transcript_metadata: Optional[Dict[str, Any]] = None
-    available_languages: List[str] = []
-    status: Optional[str] = None
-
-class TranscriptAnalysisResponse(BaseModel):
-    youtube_video_id: str
-    available_transcripts: List[Dict[str, Any]]
-    recommended_approach: str
-    processing_notes: List[str]
-
-class ProcessVideoRequest(BaseModel):
-    video_id: str = Field(..., description="The YouTube video ID of the video to process.")
-    force_regenerate: Optional[bool] = Field(False, description="Force regeneration of content even if it exists.")
-    style_preset: Optional[str] = Field(None, description="Name of content style preset to use")
-    custom_style: Optional[CustomContentStyle] = Field(None, description="Custom content style configuration")
-
-class ProcessVideoResponse(BaseModel):
-    id: Optional[int] = Field(None, description="The internal database ID of the video.")
-    youtube_video_id: str = Field(..., description="The YouTube video ID.")
-    title: Optional[str] = Field(None, description="The title of the YouTube video.")
-    transcript: Optional[str] = Field(None, description="The transcript of the video.")
-    status: Optional[str] = Field(None, description="The processing status of the video.")
-    ideas: Optional[List[ContentIdea]] = Field(None, description="Generated content ideas.")
-    content_pieces: Optional[List[Any]] = Field(None, description="Generated content pieces (e.g., Reels, Tweets).")
-
-    class Config:
-        from_attributes = True
-
-class BulkVideoProcessRequest(BaseModel):
-    video_ids: List[str] = Field(..., description="A list of YouTube video IDs to process.")
-
-class BulkVideoProcessResponseItem(BaseModel):
-    video_id: str
-    status: str
-    details: Optional[str] = None
-    data: Optional[ProcessVideoResponse] = None
-
-class ChannelRequest(BaseModel):
-    channel_id: str
-    max_videos: int = Field(..., ge=1, description="Maximum number of videos to return.")
-
-class EditContentRequest(BaseModel):
-    video_id: str = Field(..., description="The YouTube video ID of the video containing the content piece.")
-    content_piece_id: str = Field(..., description="The ID of the content piece to edit (e.g., 'video_id_001').")
-    edit_prompt: str = Field(..., description="Natural language prompt describing the changes to make.")
-    content_type: Literal["reel", "image_carousel", "tweet"] = Field(..., description="Type of content piece being edited.")
-
-class EditContentResponse(BaseModel):
-    success: bool = Field(..., description="Whether the edit was successful.")
-    content_piece_id: str = Field(..., description="The ID of the edited content piece.")
-    original_content: Optional[Dict[str, Any]] = Field(None, description="The original content before editing.")
-    edited_content: Optional[Dict[str, Any]] = Field(None, description="The new edited content.")
-    changes_made: Optional[List[str]] = Field(None, description="List of changes that were made.")
-    error_message: Optional[str] = Field(None, description="Error message if edit failed.")
-
-# Content Style Presets
-CONTENT_STYLE_PRESETS = {
-    "ecommerce_entrepreneur": ContentStylePreset(
-        name="E-commerce Entrepreneur",
-        description="For e-commerce entrepreneurs and Shopify store owners",
-        target_audience="ecom entrepreneurs, Shopify store owners, and DTC brands looking to launch, improve design, or scale with ads",
-        call_to_action="DM us to launch or fix your store, check our portfolio, and follow for ROI-boosting tips",
-        content_goal="education, lead_generation, brand_awareness",
-        language="Roman Urdu",
-        tone="Educational and engaging",
-        additional_instructions="CRITICAL LANGUAGE RULE: The output language MUST be Roman Urdu. Roman Urdu means writing Urdu words using the English alphabet. DO NOT use the native Urdu script."
-    ),
-    "professional_business": ContentStylePreset(
-        name="Professional Business",
-        description="Professional business content for corporate audiences",
-        target_audience="business professionals, entrepreneurs, and corporate decision makers",
-        call_to_action="Contact us for consultation, follow for business insights",
-        content_goal="thought_leadership, brand_awareness, lead_generation",
-        language="English",
-        tone="Professional and authoritative",
-        additional_instructions="Use industry terminology and maintain a professional tone throughout"
-    ),
-    "social_media_casual": ContentStylePreset(
-        name="Social Media Casual",
-        description="Casual, engaging content for social media audiences",
-        target_audience="general social media users, millennials, and Gen Z",
-        call_to_action="Like, share, and follow for more content",
-        content_goal="entertainment, engagement, brand_awareness",
-        language="English",
-        tone="Casual and fun",
-        additional_instructions="Use emojis, trendy language, and keep it conversational"
-    ),
-    "educational_content": ContentStylePreset(
-        name="Educational Content",
-        description="Educational and informative content for learners",
-        target_audience="students, professionals seeking knowledge, lifelong learners",
-        call_to_action="Subscribe for more educational content, share with others",
-        content_goal="education, knowledge_sharing, community_building",
-        language="English",
-        tone="Informative and encouraging",
-        additional_instructions="Break down complex topics into digestible pieces, use examples and analogies"
-    ),
-    "fitness_wellness": ContentStylePreset(
-        name="Fitness & Wellness",
-        description="Health, fitness, and wellness focused content",
-        target_audience="fitness enthusiasts, health-conscious individuals, wellness seekers",
-        call_to_action="Follow for daily tips, share your progress, join our community",
-        content_goal="motivation, education, community_building",
-        language="English",
-        tone="Motivational and supportive",
-        additional_instructions="Use encouraging language, focus on positive health outcomes, include actionable tips"
-    )
-}
-
-def get_content_style_prompt(style_preset: Optional[str] = None, custom_style: Optional[CustomContentStyle] = None) -> str:
-    """Generate content style prompt based on preset or custom style"""
-    if custom_style:
-        style_text = f"""
-        "Target Audience: {custom_style.target_audience}"
-        "Call To Action: {custom_style.call_to_action}"
-        "Content Goal: {custom_style.content_goal}"
-        "Language: {custom_style.language}"
-        "Tone: {custom_style.tone}"
-        """
-        if custom_style.additional_instructions:
-            style_text += f'"Additional Instructions: {custom_style.additional_instructions}"'
-    elif style_preset and style_preset in CONTENT_STYLE_PRESETS:
-        preset = CONTENT_STYLE_PRESETS[style_preset]
-        style_text = f"""
-        "Target Audience: {preset.target_audience}"
-        "Call To Action: {preset.call_to_action}"
-        "Content Goal: {preset.content_goal}"
-        "Language: {preset.language}"
-        "Tone: {preset.tone}"
-        """
-        if preset.additional_instructions:
-            style_text += f'"Additional Instructions: {preset.additional_instructions}"'
-    else:
-        # Default style (original ecommerce style)
-        style_text = """
-        "Target Audience: ecom entrepreneurs, Shopify store owners, and DTC brands looking to launch, improve design, or scale with ads."
-        "Call To Action: DM us to launch or fix your store, check our portfolio, and follow for ROI-boosting tips."
-        "Content Goal: education, lead_generation, brand_awareness."
-        "Language: Roman Urdu"
-        "Tone: Educational and engaging"
-        "CRITICAL LANGUAGE RULE: The output language MUST be Roman Urdu. Roman Urdu means writing Urdu words using the English alphabet. DO NOT use the native Urdu script."
-        """
-    
-    return style_text
-
+# Database dependency
 def get_db():
     db = SessionLocal()
     try:
@@ -258,35 +78,12 @@ def get_db():
     finally:
         db.close()
 
-app = FastAPI(title="YouTube Repurposer API", version="0.1.3")
 
-# Configure CORS
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],  # Frontend origins
-    allow_credentials=True,
-    allow_methods=["*"],  # Allow all methods (GET, POST, etc.)
-    allow_headers=["*"],  # Allow all headers
-)
+# Include routers
+from api.routers.configuration import router as config_router
+app.include_router(config_router)
 
-executor = ThreadPoolExecutor(max_workers=10)
-
-
-@app.get("/content-styles/presets/")
-async def get_style_presets():
-    """Get all available content style presets"""
-    return {
-        "presets": {
-            key: {
-                "name": preset.name,
-                "description": preset.description,
-                "target_audience": preset.target_audience,
-                "language": preset.language,
-                "tone": preset.tone
-            } for key, preset in CONTENT_STYLE_PRESETS.items()
-        }
-    }
-
+# Add all endpoint functions from original main.py
 @app.post("/process-video-stream/")
 async def process_video_stream(request: ProcessVideoRequest, db: Session = Depends(get_db)):
     """Process video with real-time streaming updates"""
@@ -517,49 +314,6 @@ async def get_all_videos(skip: int = 0, limit: int = 100, db: Session = Depends(
     except Exception as e:
         logging.exception(f"Error fetching videos: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to fetch videos: {str(e)}")
-@app.get("/content-styles/presets/{preset_name}")
-async def get_style_preset(preset_name: str):
-    """Get details of a specific content style preset including content configuration"""
-    if preset_name not in CONTENT_STYLE_PRESETS:
-        raise HTTPException(status_code=404, detail=f"Style preset '{preset_name}' not found")
-    
-    preset = CONTENT_STYLE_PRESETS[preset_name]
-    return {
-        "name": preset.name,
-        "description": preset.description,
-        "target_audience": preset.target_audience,
-        "call_to_action": preset.call_to_action,
-        "content_goal": preset.content_goal,
-        "language": preset.language,
-        "tone": preset.tone,
-        "additional_instructions": preset.additional_instructions,
-        "content_config": preset.content_config.model_dump()
-    }
-
-@app.get("/content-config/default")
-async def get_default_content_config():
-    """Get the default content generation configuration including field limits"""
-    from repurpose import DEFAULT_FIELD_LIMITS
-    
-    return {
-        "description": "Default configuration for content generation",
-        "field_limits": DEFAULT_FIELD_LIMITS,
-        "min_ideas": 6,
-        "max_ideas": 8,
-        "content_pieces_per_idea": 1,
-        "note": "These are the default settings. You can override them in custom_style.content_config when processing videos/documents."
-    }
-
-@app.get("/content-config/current")
-async def get_current_content_config():
-    """Get the currently active content generation configuration"""
-    from repurpose import CURRENT_FIELD_LIMITS
-    
-    return {
-        "description": "Currently active configuration for content generation",
-        "field_limits": CURRENT_FIELD_LIMITS,
-        "note": "This shows the active configuration. To use custom limits, pass them in the content_config parameter when processing."
-    }
 @app.on_event("startup")
 async def on_startup():
     init_db()

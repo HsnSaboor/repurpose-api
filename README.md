@@ -7,13 +7,13 @@ Transform any YouTube video into Instagram Reels, Tweets, and Image Carousels wi
 ## ✨ Features
 
 - **🎥 Video Transcription**: Extract accurate transcripts from YouTube videos
+- **📄 Document Processing**: Process TXT, MD, DOCX, and PDF files
 - **🤖 AI Content Generation**: Generate Instagram Reels, Tweets, and Image Carousels using advanced LLM
 - **⚙️ Fully Configurable**: Customize field lengths, slide counts, and content generation settings per content type
 - **✏️ Natural Language Editing**: Edit generated content using simple prompts
 - **🔄 Smart Validation**: Automatically retry and fix validation errors to ensure 100% content recovery
-- **📦 Bulk Processing**: Process multiple videos simultaneously
+- **📦 Bulk Processing**: Process multiple videos/documents simultaneously
 - **📝 Enhanced Carousel Content**: Generate detailed, comprehensive carousel slides (800 chars with 3-5 sentences)
-- **🌐 REST API**: Complete RESTful API with comprehensive documentation
 - **⚡ Fast & Scalable**: Built with FastAPI for high performance
 
 ## 🏗️ Project Structure
@@ -238,10 +238,10 @@ const response = await fetch('/process-video/', {
 ### 📚 Configuration Documentation
 
 For complete details on configuration options, see:
-- **[Content Configuration Guide](./CONTENT_CONFIGURATION_GUIDE.md)** - Comprehensive API configuration documentation
-- **[CLI Configuration Guide](./CLI_CONFIGURATION_GUIDE.md)** - CLI usage and configuration options
-- **[Quick Reference](./QUICK_REFERENCE_CONFIG.md)** - Quick reference cheat sheet
-- **[Configuration Update Summary](./CONFIGURATION_UPDATE_SUMMARY.md)** - Technical details of recent enhancements
+- **[Content Configuration Guide](./docs/CONTENT_CONFIGURATION_GUIDE.md)** - Comprehensive API configuration documentation
+- **[CLI Configuration Guide](./docs/CLI_CONFIGURATION_GUIDE.md)** - CLI usage and configuration options
+- **[Quick Reference](./docs/QUICK_REFERENCE_CONFIG.md)** - Quick reference cheat sheet
+- **[Configuration Update Summary](./docs/CONFIGURATION_UPDATE_SUMMARY.md)** - Technical details of recent enhancements
 
 ## 💻 Frontend Integration Examples
 

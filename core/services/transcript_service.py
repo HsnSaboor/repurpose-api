@@ -1,157 +1,47 @@
-"""Enhanced YouTube Transcript Service with English Preference"""
+"""
+Enhanced YouTube Transcript Service with English Preference
+Main service file - imports models and cache functions
+"""
+
 from youtube_transcript_api import YouTubeTranscriptApi
-from typing import List, Dict, Optional, Any, Union
-from enum import Enum
-from pydantic import BaseModel
+from typing import List, Dict, Optional, Any
 import logging
-import re
 import json
-import hashlib
-from datetime import datetime, timedelta
+
+# Import from split modules
+from core.services.transcript_models import (
+    TranscriptPriority,
+    TranscriptMetadata,
+    EnglishTranscriptResult,
+    TranscriptPreferences
+)
+from core.services.transcript_cache import (
+    get_cached_transcript,
+    cache_transcript,
+    clear_expired_cache,
+    get_cache_statistics,
+    cleanup_cache
+)
 from sqlalchemy.orm import Session
-from sqlalchemy import create_engine
-import os
 
-class TranscriptPriority(Enum):
-    """Priority levels for transcript selection"""
-    MANUAL_ENGLISH = 1
-    AUTO_ENGLISH = 2
-    MANUAL_TRANSLATED = 3
-    AUTO_TRANSLATED = 4
-
-class TranscriptMetadata(BaseModel):
-    """Metadata about a transcript"""
-    language_code: str
-    language: str
-    is_generated: bool
-    is_translatable: bool
-    translation_languages: List[str] = []
-
-class EnglishTranscriptResult(BaseModel):
-    """Result of English transcript processing"""
-    transcript_text: str
-    language_code: str
-    language: str
-    is_generated: bool
-    is_translated: bool
-    priority: TranscriptPriority
-    translation_source_language: Optional[str] = None
-    confidence_score: float = 1.0
-    processing_notes: List[str] = []
-
-class TranscriptPreferences(BaseModel):
-    """User preferences for transcript processing"""
-    prefer_manual: bool = True
-    require_english: bool = True
-    enable_translation: bool = True
-    fallback_languages: List[str] = ["en", "es", "fr", "de"]
-    preserve_formatting: bool = False
-
-# Caching functions
-def get_cache_key(video_id: str, language_code: str, transcript_type: str) -> str:
-    """Generate a unique cache key for transcript data"""
-    return f"{video_id}_{language_code}_{transcript_type}"
-
-def get_cached_transcript(video_id: str, language_code: str, transcript_type: str, db_session: Optional[Session] = None) -> Optional[str]:
-    """Retrieve cached transcript data"""
-    if not db_session:
-        return None
-    
-    try:
-        from core.database import TranscriptCache
-        
-        cache_entry = db_session.query(TranscriptCache).filter(
-            TranscriptCache.video_id == video_id,
-            TranscriptCache.language_code == language_code,
-            TranscriptCache.transcript_type == transcript_type
-        ).first()
-        
-        if cache_entry:
-            # Check if cache is still valid (7 days)
-            cache_age = datetime.utcnow() - cache_entry.cached_at
-            if cache_age < timedelta(days=7):
-                logging.info(f"Cache hit for {video_id} ({language_code}, {transcript_type})")
-                return cache_entry.transcript_text
-            else:
-                # Cache expired, remove it
-                db_session.delete(cache_entry)
-                db_session.commit()
-                logging.info(f"Cache expired and removed for {video_id}")
-        
-        return None
-        
-    except Exception as e:
-        logging.error(f"Error retrieving cached transcript: {e}")
-        return None
-
-def cache_transcript(video_id: str, language_code: str, transcript_type: str, transcript_text: str, 
-                    is_translated: bool = False, source_language: Optional[str] = None, 
-                    db_session: Optional[Session] = None) -> bool:
-    """Cache transcript data for future use"""
-    if not db_session:
-        return False
-    
-    try:
-        from core.database import TranscriptCache
-        
-        # Check if entry already exists
-        existing_entry = db_session.query(TranscriptCache).filter(
-            TranscriptCache.video_id == video_id,
-            TranscriptCache.language_code == language_code,
-            TranscriptCache.transcript_type == transcript_type
-        ).first()
-        
-        if existing_entry:
-            # Update existing entry
-            existing_entry.transcript_text = transcript_text
-            existing_entry.is_translated = is_translated
-            existing_entry.source_language = source_language
-            existing_entry.cached_at = datetime.utcnow()
-        else:
-            # Create new cache entry
-            cache_entry = TranscriptCache(
-                video_id=video_id,
-                language_code=language_code,
-                transcript_type=transcript_type,
-                transcript_text=transcript_text,
-                is_translated=is_translated,
-                source_language=source_language
-            )
-            db_session.add(cache_entry)
-        
-        db_session.commit()
-        logging.info(f"Cached transcript for {video_id} ({language_code}, {transcript_type})")
-        return True
-        
-    except Exception as e:
-        logging.error(f"Error caching transcript: {e}")
-        db_session.rollback()
-        return False
-
-def clear_expired_cache(db_session: Optional[Session] = None, days_old: int = 7) -> int:
-    """Clear expired cache entries"""
-    if not db_session:
-        return 0
-    
-    try:
-        from core.database import TranscriptCache
-        
-        cutoff_date = datetime.utcnow() - timedelta(days=days_old)
-        expired_entries = db_session.query(TranscriptCache).filter(
-            TranscriptCache.cached_at < cutoff_date
-        )
-        
-        count = expired_entries.count()
-        expired_entries.delete()
-        db_session.commit()
-        
-        logging.info(f"Cleared {count} expired cache entries")
-        return count
-        
-    except Exception as e:
-        logging.error(f"Error clearing expired cache: {e}")
-        db_session.rollback()
-        return 0
+# Re-export for backward compatibility
+__all__ = [
+    'TranscriptPriority',
+    'TranscriptMetadata',
+    'EnglishTranscriptResult',
+    'TranscriptPreferences',
+    'get_english_transcript',
+    'get_transcript',
+    'get_transcript_safely',
+    'get_transcript_text',
+    'get_available_languages',
+    'list_available_transcripts_with_metadata',
+    'get_cached_transcript',
+    'cache_transcript',
+    'clear_expired_cache',
+    'get_cache_statistics',
+    'cleanup_cache'
+]
 
 def list_available_transcripts_with_metadata(video_id: str) -> List[TranscriptMetadata]:
     """List all available transcripts with detailed metadata"""
@@ -561,4 +451,3 @@ def cleanup_cache(db_session: Optional[Session] = None, max_entries: int = 1000)
     except Exception as e:
         logging.error(f"Error during cache cleanup: {e}")
         db_session.rollback()
-        return {"removed": 0, "remaining": 0}

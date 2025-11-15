@@ -1778,3 +1778,108 @@ TypeError: Object of type ContentIdea is not JSON serializable
 2025-11-15 21:42:34,780 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
 2025-11-15 21:42:41,587 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
 2025-11-15 21:42:43,557 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-11-15 23:08:18,920 - INFO - [find_best_english_transcript_source] - Found manual English transcript for dQw4w9WgXcQ
+2025-11-15 23:08:19,103 - INFO - [get_english_transcript] - Successfully processed transcript for dQw4w9WgXcQ: MANUAL_ENGLISH, confidence: 1.00
+2025-11-15 23:08:52,770 - INFO - [process_video] - Attempting to parse stored repurposed_text for video dQw4w9WgXcQ (DB ID: 13) using robust parser.
+2025-11-15 23:08:52,836 - INFO - [process_video] - Attempting to parse stored repurposed_text for video dQw4w9WgXcQ (DB ID: 13) using robust parser.
+2025-11-15 23:08:52,892 - INFO - [process_video] - Attempting to parse stored repurposed_text for video dQw4w9WgXcQ (DB ID: 13) using robust parser.
+2025-11-15 23:08:52,946 - INFO - [process_video] - Attempting to parse stored repurposed_text for video dQw4w9WgXcQ (DB ID: 13) using robust parser.
+2025-11-15 23:09:59,225 - INFO - [parse_document] - Parsing document: /tmp/tmppufg2zsu.txt (format: .txt)
+2025-11-15 23:09:59,230 - INFO - [parse_document] - Successfully parsed TXT document: 274 characters
+2025-11-15 23:10:11,527 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-11-15 23:10:11,579 - ERROR - [process_document] - Error processing document test_doc.txt: name 're' is not defined
+Traceback (most recent call last):
+  File "/home/saboor/code/repurpose-api/main.py", line 1111, in process_document
+    generated_content = await loop.run_in_executor(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<8 lines>...
+    )
+    ^
+  File "/usr/lib/python3.13/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/home/saboor/code/repurpose-api/repurpose.py", line 328, in generate_specific_content_pieces
+    video_id = extract_video_id(video_url) or "unknown"
+               ~~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "/home/saboor/code/repurpose-api/repurpose.py", line 99, in extract_video_id
+    match = re.search(pattern, url)
+            ^^
+NameError: name 're' is not defined. Did you forget to import 're'?
+2025-11-15 23:12:53,504 - INFO - [parse_document] - Parsing document: /tmp/cli_test_doc.txt (format: .txt)
+2025-11-15 23:12:53,505 - INFO - [parse_document] - Successfully parsed TXT document: 279 characters
+2025-11-15 23:13:08,758 - INFO - [parse_document] - Parsing document: /tmp/cli_test_video.txt (format: .txt)
+2025-11-15 23:13:08,759 - ERROR - [process_sources] - Error parsing document /tmp/cli_test_video.txt: Document appears to be empty or too short (< 50 characters)
+2025-11-15 23:13:13,011 - CRITICAL - [<module>] - Critical unhandled error during script execution.
+Traceback (most recent call last):
+  File "/home/saboor/code/repurpose-api/repurpose.py", line 832, in <module>
+    sources = parse_input_source(args.input_source)
+  File "/home/saboor/code/repurpose-api/repurpose.py", line 515, in parse_input_source
+    vid = extract_video_id(item)
+  File "/home/saboor/code/repurpose-api/repurpose.py", line 99, in extract_video_id
+    match = re.search(pattern, url)
+            ^^
+NameError: name 're' is not defined. Did you mean: 'e'? Or did you forget to import 're'?
+2025-11-16 01:29:06,439 - INFO - [find_best_english_transcript_source] - Found auto-generated Hindi (auto-generated) transcript for nLm4AZ63T8w (translatable: False)
+2025-11-16 01:29:07,156 - ERROR - [get_english_transcript] - Translation failed for nLm4AZ63T8w: 
+Could not retrieve a transcript for the video https://www.youtube.com/watch?v=nLm4AZ63T8w! This is most likely caused by:
+
+The requested language is not translatable
+
+If you are sure that the described cause is not responsible for this error and that a transcript should be retrievable, please create an issue at https://github.com/jdepoix/youtube-transcript-api/issues. Please add which version of youtube_transcript_api you are using and provide the information needed to replicate the error. Also make sure that there are no open issues which already describe your problem!
+2025-11-16 01:29:07,156 - INFO - [get_english_transcript] - Successfully processed transcript for nLm4AZ63T8w: AUTO_TRANSLATED, confidence: 0.80
+2025-11-16 01:29:31,293 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-11-16 01:30:07,316 - INFO - [find_best_english_transcript_source] - Found auto-generated Hindi (auto-generated) transcript for nLm4AZ63T8w (translatable: False)
+2025-11-16 01:30:08,035 - ERROR - [get_english_transcript] - Translation failed for nLm4AZ63T8w: 
+Could not retrieve a transcript for the video https://www.youtube.com/watch?v=nLm4AZ63T8w! This is most likely caused by:
+
+The requested language is not translatable
+
+If you are sure that the described cause is not responsible for this error and that a transcript should be retrievable, please create an issue at https://github.com/jdepoix/youtube-transcript-api/issues. Please add which version of youtube_transcript_api you are using and provide the information needed to replicate the error. Also make sure that there are no open issues which already describe your problem!
+2025-11-16 01:30:08,035 - INFO - [get_english_transcript] - Successfully processed transcript for nLm4AZ63T8w: AUTO_TRANSLATED, confidence: 0.80
+2025-11-16 01:30:26,247 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-11-16 01:34:21,742 - INFO - [find_best_english_transcript_source] - Found auto-generated Hindi (auto-generated) transcript for nLm4AZ63T8w (translatable: False)
+2025-11-16 01:34:22,265 - ERROR - [get_english_transcript] - Translation failed for nLm4AZ63T8w: 
+Could not retrieve a transcript for the video https://www.youtube.com/watch?v=nLm4AZ63T8w! This is most likely caused by:
+
+The requested language is not translatable
+
+If you are sure that the described cause is not responsible for this error and that a transcript should be retrievable, please create an issue at https://github.com/jdepoix/youtube-transcript-api/issues. Please add which version of youtube_transcript_api you are using and provide the information needed to replicate the error. Also make sure that there are no open issues which already describe your problem!
+2025-11-16 01:34:22,265 - INFO - [get_english_transcript] - Successfully processed transcript for nLm4AZ63T8w: AUTO_TRANSLATED, confidence: 0.80
+2025-11-16 01:34:39,076 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-11-16 01:37:18,211 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-11-16 01:37:40,603 - ERROR - [process_sources] - Error fetching transcript for nLm4AZ63T8w: name 'TranscriptPreferences' is not defined
+2025-11-16 01:38:31,323 - INFO - [find_best_english_transcript_source] - Found manual English transcript for dQw4w9WgXcQ
+2025-11-16 01:38:31,732 - INFO - [get_english_transcript] - Successfully processed transcript for dQw4w9WgXcQ: MANUAL_ENGLISH, confidence: 1.00
+2025-11-16 01:38:41,031 - INFO - [find_best_english_transcript_source] - Found auto-generated Hindi (auto-generated) transcript for nLm4AZ63T8w (translatable: False)
+2025-11-16 01:38:41,586 - ERROR - [get_english_transcript] - Translation failed for nLm4AZ63T8w: 
+Could not retrieve a transcript for the video https://www.youtube.com/watch?v=nLm4AZ63T8w! This is most likely caused by:
+
+The requested language is not translatable
+
+If you are sure that the described cause is not responsible for this error and that a transcript should be retrievable, please create an issue at https://github.com/jdepoix/youtube-transcript-api/issues. Please add which version of youtube_transcript_api you are using and provide the information needed to replicate the error. Also make sure that there are no open issues which already describe your problem!
+2025-11-16 01:38:41,586 - INFO - [get_english_transcript] - Successfully processed transcript for nLm4AZ63T8w: AUTO_TRANSLATED, confidence: 0.80
+2025-11-16 01:38:43,919 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-11-16 01:38:50,884 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-11-16 01:39:06,143 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-11-16 01:39:07,549 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-11-16 01:39:15,357 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-11-16 01:39:19,863 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-11-16 01:39:28,689 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-11-16 01:39:49,494 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-11-16 01:39:52,120 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-11-16 01:39:59,493 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-11-16 01:40:01,132 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-11-16 01:40:10,654 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-11-16 01:40:14,750 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-11-16 01:40:49,670 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-11-16 01:40:59,704 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-11-16 01:41:17,317 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-11-16 01:41:56,037 - INFO - [find_best_english_transcript_source] - Found auto-generated Hindi (auto-generated) transcript for nLm4AZ63T8w (translatable: False)
+2025-11-16 01:41:56,576 - ERROR - [get_english_transcript] - Translation failed for nLm4AZ63T8w: 
+Could not retrieve a transcript for the video https://www.youtube.com/watch?v=nLm4AZ63T8w! This is most likely caused by:
+
+The requested language is not translatable
+
+If you are sure that the described cause is not responsible for this error and that a transcript should be retrievable, please create an issue at https://github.com/jdepoix/youtube-transcript-api/issues. Please add which version of youtube_transcript_api you are using and provide the information needed to replicate the error. Also make sure that there are no open issues which already describe your problem!
+2025-11-16 01:41:56,577 - INFO - [get_english_transcript] - Successfully processed transcript for nLm4AZ63T8w: AUTO_TRANSLATED, confidence: 0.80
+2025-11-16 01:42:21,841 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"
+2025-11-16 01:42:33,095 - INFO - [_send_single_request] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/chat/completions "HTTP/1.1 200 OK"

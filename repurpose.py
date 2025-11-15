@@ -1,140 +1,64 @@
-# -*- coding: utf-8 -*-
-"""YouTube Video Processor with Gemini AI Integration via OpenAI Compatibility Layer
-Handles various inputs, fetches transcripts, generates content (Reels, Tweets, Carousels),
-and exports to a structured format with special handling for Image Carousels.
+"""
+YouTube Content Repurposer - CLI Interface
+Imports core functionality from modules
 """
 
-# --- Imports ---
-import argparse
-import csv
-import json
-import logging
 import os
-import re
 import sys
-import threading
-import time
-from collections import deque
-from datetime import datetime, timedelta
-from enum import Enum
-from logging import StreamHandler
-from typing import Any, Dict, List, Literal, Optional, Union
-
+import csv
+import re
+import json
 import pandas as pd
-import yt_dlp
-from dotenv import load_dotenv
-from openai import OpenAI
-from pydantic import BaseModel, Field, ValidationError
+import time
+import argparse
+import logging
+from typing import List, Dict, Any, Optional, Union
 from rich.console import Console
-from rich.progress import (BarColumn, Progress, SpinnerColumn, TaskProgressColumn,
-                           TextColumn, TimeElapsedColumn, TimeRemainingColumn)
-from yt_dlp.utils import DownloadError
+from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TaskProgressColumn, TimeElapsedColumn
+from pydantic import ValidationError
 
-# Import services
+# Import from our modules
+from core.content.models import (
+    ContentIdea,
+    GeneratedIdeas,
+    ContentType,
+    Reel,
+    ImageCarousel,
+    Tweet,
+    GeneratedContentList,
+    CarouselSlide,
+    DEFAULT_FIELD_LIMITS,
+    CURRENT_FIELD_LIMITS,
+    update_field_limits,
+    get_field_limit
+)
+
+from core.content.prompts import CONTENT_STYLE, get_system_prompt_generate_ideas, get_system_prompt_generate_content
 from core.services.transcript_service import get_english_transcript, TranscriptPreferences
-from core.services.content_service import ContentGenerator, ContentIdea
 from core.services.video_service import get_video_title
-from core.services.document_service import DocumentParser, extract_text_from_document
+from core.services.document_service import DocumentParser
+from core.services.content_service import ContentGenerator
+from dotenv import load_dotenv
 
-# Load environment variables from .env file
+# Load environment variables
 load_dotenv()
 
-# --- Content Style Definition (IMPROVED FOR ROMAN URDU) ---
-CONTENT_STYLE = """
-    "Target Audience: ecom entrepreneurs, Shopify store owners, and DTC brands looking to launch, improve design, or scale with ads."
-    "Call To Action: DM us to launch or fix your store, check our portfolio, and follow for ROI-boosting tips."
-    "Content Goal: education, lead_generation, brand_awareness."
-    "---"
-    "CRITICAL LANGUAGE RULE: The output language MUST be Roman Urdu."
-    "Roman Urdu means writing Urdu words using the English alphabet. DO NOT use the native Urdu script."
-    "EXAMPLE:"
-    "  - CORRECT (Roman Urdu): 'Aap kaise hain?'"
-    "  - INCORRECT (Urdu Script): 'آپ کیسے ہیں؟'"
-    "This is a strict requirement for all generated text, including titles, captions, and scripts."
-"""
+# Re-export for backward compatibility
+__all__ = [
+    'ContentIdea', 'GeneratedIdeas', 'ContentType',
+    'Reel', 'ImageCarousel', 'Tweet', 'GeneratedContentList',
+    'DEFAULT_FIELD_LIMITS', 'CURRENT_FIELD_LIMITS',
+    'update_field_limits', 'get_field_limit',
+    'extract_video_id', 'generate_content_ideas',
+    'generate_specific_content_pieces', 'edit_content_piece_with_diff',
+    'identify_content_changes', 'get_video_title'
+]
 
-# --- Pydantic Models ---
-class ContentIdea(BaseModel):
-    suggested_content_type: Literal["reel", "image_carousel", "tweet"] = Field(..., description="Type of content suggested.")
-    suggested_title: str = Field(..., max_length=100, description="Suggested title for the content.")
-    relevant_transcript_snippet: str = Field(..., description="Snippet from the transcript that inspired this idea.")
-    type_specific_suggestions: Optional[Dict[str, Any]] = Field(None, description="Type-specific suggestions for the content.")
-
-class GeneratedIdeas(BaseModel):
-    ideas: List[ContentIdea] = Field(..., description="A list of generated content ideas.")
-
-class ContentType(str, Enum):
-    REEL = "reel"
-    IMAGE_CAROUSEL = "image_carousel"
-    TWEET = "tweet"
-
-# Default content field limits (can be overridden via config)
-DEFAULT_FIELD_LIMITS = {
-    "reel_title_max": 100,
-    "reel_caption_max": 300,
-    "reel_hook_max": 200,
-    "reel_script_max": 2000,
-    "carousel_title_max": 100,
-    "carousel_caption_max": 300,
-    "carousel_slide_heading_max": 100,
-    "carousel_slide_text_max": 800,  # Increased from 300 for more detailed content
-    "carousel_min_slides": 4,
-    "carousel_max_slides": 8,
-    "tweet_title_max": 100,
-    "tweet_text_max": 280,
-    "tweet_thread_item_max": 280
-}
-
-# Global variable to store current field limits (can be updated dynamically)
-CURRENT_FIELD_LIMITS = DEFAULT_FIELD_LIMITS.copy()
-
-def update_field_limits(new_limits: dict):
-    """Update the global field limits configuration"""
-    global CURRENT_FIELD_LIMITS
-    CURRENT_FIELD_LIMITS.update(new_limits)
-
-def get_field_limit(key: str) -> int:
-    """Get a specific field limit"""
-    return CURRENT_FIELD_LIMITS.get(key, DEFAULT_FIELD_LIMITS.get(key, 1000))
-
-class CarouselSlide(BaseModel):
-    slide_number: int
-    step_number: int = Field(..., description="Step number in the carousel.")
-    step_heading : str = Field(..., description="Heading for this step.")
-    text: str = Field(None, description="Detailed text content for the slide. This is the main content.")
-
-class Reel(BaseModel):
-    content_id: str = Field(..., description="Serial number for this content.")
-    content_type: Literal[ContentType.REEL] = ContentType.REEL
-    title: str = Field(...)
-    caption: str = Field(None)
-    hook: str = Field(..., description="Attention-grabbing hook.")
-    script_body: str = Field(..., description="Main script content.")
-    visual_suggestions: Optional[str] = Field(None)
-    hashtags: List[str] = Field(None)
-
-class ImageCarousel(BaseModel):
-    content_id: str = Field(..., description="Serial number for this content.")
-    content_type: Literal[ContentType.IMAGE_CAROUSEL] = ContentType.IMAGE_CAROUSEL
-    title: str = Field(...)
-    caption: str = Field(None)
-    slides: List[CarouselSlide] = Field(...)
-    hashtags: List[str] = Field(None)
-
-class Tweet(BaseModel):
-    content_id: str = Field(..., description="Serial number for this content.")
-    content_type: Literal[ContentType.TWEET] = ContentType.TWEET
-    title: str = Field(...)
-    tweet_text: str = Field(...)
-    thread_continuation: Optional[List[str]] = Field(None)
-    hashtags: List[str] = Field(None)
-
-class GeneratedContentList(BaseModel):
-    pieces: List[Union[Reel, ImageCarousel, Tweet]]
-
-# --- Configuration ---
 console = Console()
-OUTPUT_DIR = "output"
+logger = logging.getLogger(__name__)
+
+# Configuration
+OUTPUT_DIR = "./output"
 CAROUSELS_DIR = os.path.join(OUTPUT_DIR, "carousels")
 SLIDES_DIR = os.path.join(OUTPUT_DIR, "slides")
 GENERATED_CONTENT_CSV = os.path.join(OUTPUT_DIR, "generated_content.csv")
@@ -144,20 +68,22 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 os.makedirs(CAROUSELS_DIR, exist_ok=True)
 os.makedirs(SLIDES_DIR, exist_ok=True)
 
+# Initialize logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - [%(funcName)s] - %(message)s',
     handlers=[logging.FileHandler(REPURPOSE_LOG_FILE, encoding='utf-8')]
 )
-logger = logging.getLogger(__name__)
 
-# --- Initialize Content Generator ---
+# Initialize Content Generator
 api_key = os.getenv("GEMINI_API_KEY")
 if not api_key:
-    console.print("[bold red]ERROR: GEMINI_API_KEY not found in environment variables. Exiting.[/bold red]")
-    sys.exit(1)
-gemini_base_url = os.getenv("GEMINI_BASE_URL", "https://generativelanguage.googleapis.com/v1beta")
-content_generator = ContentGenerator(api_key=api_key, base_url=gemini_base_url)
+    console.print("[bold red]ERROR: GEMINI_API_KEY not found in environment variables.[/bold red]")
+    # Don't exit - let it fail later if actually used
+    content_generator = None
+else:
+    gemini_base_url = os.getenv("GEMINI_BASE_URL", "https://generativelanguage.googleapis.com/v1beta")
+    content_generator = ContentGenerator(api_key=api_key, base_url=gemini_base_url)
 
 def extract_video_id(url: str) -> Optional[str]:
     """Extracts the 11-character video ID from various YouTube URL formats."""
@@ -177,135 +103,6 @@ def extract_video_id(url: str) -> Optional[str]:
             return match.group(1)
     return None
 
-
-def call_gemini_api(system_prompt: str, user_prompt: str) -> Optional[Dict[str, Any]]:
-    rate_limiter.wait_for_capacity()
-    try:
-        response = client.chat.completions.create(
-            model="gemini-2.5-flash", messages=[{"role": "system", "content": system_prompt}, {"role": "user", "content": user_prompt}],
-            response_format={"type": "json_object"}, temperature=0.7
-        )
-        if response.choices and response.choices[0].message.content:
-            content_str = response.choices[0].message.content.strip()
-            if content_str.startswith("```json"): content_str = content_str[7:-3].strip()
-            return json.loads(content_str)
-        logger.error("No content in LLM response.")
-    except Exception as e:
-        logger.error(f"Error in API call: {e}", exc_info=True)
-    return None
-
-def get_system_prompt_generate_ideas(content_style: str = "{CONTENT_STYLE}", min_ideas: int = 6, max_ideas: int = 8) -> str:
-    """Generate the system prompt for idea generation with configurable limits"""
-    return f"""
-You are an expert AI assistant specializing in analyzing video transcripts to identify diverse, repurposable content ideas.
-Your goal is to analyze the provided transcript and suggest {min_ideas} to {max_ideas} distinct content ideas (Reels, Image Carousels, Tweets).
-
-Output Format:
-You MUST return a single JSON object. This object must have a single key named "ideas".
-The value for "ideas" must be a list of JSON objects with {min_ideas} to {max_ideas} items.
-Each object in the list represents one content idea and MUST have the following structure:
-{{{{
-  "suggested_content_type": "<'reel'|'image_carousel'|'tweet'>",
-  "suggested_title": "<string, a catchy and relevant title for the content>",
-  "relevant_transcript_snippet": "<string, a short, direct quote from the transcript that inspired this idea>",
-  "type_specific_suggestions": {{{{}}}}
-}}}}
-
-Content Style to Follow:
-{content_style}
-"""
-
-def get_system_prompt_generate_content(content_style: str = "{CONTENT_STYLE}") -> str:
-    """Generate the system prompt for content generation with configurable field limits"""
-    limits = CURRENT_FIELD_LIMITS
-    
-    return f"""
-You are an expert AI content creator. Your task is to take a specific content idea and generate the full content piece.
-You MUST follow the JSON schema for the requested `content_type` with absolute precision. All required fields MUST be included.
-
-**Content Type Schemas:**
-
-If `content_type` is "reel", the JSON MUST look like this:
-```json
-{{{{
-  "content_type": "reel",
-  "title": "<string, the title for the reel, max {limits['reel_title_max']} chars>",
-  "caption": "<string, a short, engaging caption, max {limits['reel_caption_max']} chars>",
-  "hook": "<string, a strong, attention-grabbing opening line, max {limits['reel_hook_max']} chars, required>",
-  "script_body": "<string, the main script for the reel, max {limits['reel_script_max']} chars, required>",
-  "visual_suggestions": "<string, optional suggestions for visuals>",
-  "hashtags": ["<list of relevant string hashtags>"]
-}}}}
-
-
-If content_type is "image_carousel", the JSON MUST look like this:
-      
-{{{{
-  "content_type": "image_carousel",
-  "title": "<string, the title for the carousel, max {limits['carousel_title_max']} chars>",
-  "caption": "<string, a short, engaging caption, max {limits['carousel_caption_max']} chars>",
-  "slides": [
-    {{{{
-      "slide_number": 1,
-      "step_number": 1,
-      "step_heading": "<string, SHORT heading for this step, max {limits['carousel_slide_heading_max']} chars - e.g., 'Step 1: Setup' or 'Choose Your Niche'>",
-      "text": "<string, DETAILED TEXT CONTENT - This is the PRIMARY content field. Write 3-5 sentences with specific details, examples, actionable tips, or explanations. Make it comprehensive and valuable. Min 400 chars recommended, max {limits['carousel_slide_text_max']} chars. Do NOT repeat the heading - only provide the detailed explanation.>"
-    }},
-    {{{{
-      "slide_number": 2,
-      "step_number": 2,
-      "step_heading": "<string, SHORT heading for this step, max {limits['carousel_slide_heading_max']} chars>",
-      "text": "<string, DETAILED TEXT CONTENT - Multiple sentences with specifics, reasoning, examples, and actionable information. Make this substantial and informative. 400-{limits['carousel_slide_text_max']} chars.>"
-    }},
-    {{{{
-      "slide_number": 3,
-      "step_number": 3,
-      "step_heading": "<string, SHORT heading for this step, max {limits['carousel_slide_heading_max']} chars>",
-      "text": "<string, DETAILED TEXT CONTENT - Provide depth and context. Include why, how, or what makes this important. Use examples if relevant. 400-{limits['carousel_slide_text_max']} chars.>"
-    }},
-    {{{{
-      "slide_number": 4,
-      "step_number": 4,
-      "step_heading": "<string, SHORT heading for this step, max {limits['carousel_slide_heading_max']} chars>",
-      "text": "<string, DETAILED TEXT CONTENT - Comprehensive explanation with actionable details. Think mini-article, not caption. 400-{limits['carousel_slide_text_max']} chars.>"
-    }}}}
-  ],
-  "hashtags": ["<list of relevant string hashtags>"]
-}}
-
-
-If content_type is "tweet", the JSON MUST look like this:
-      
-{{{{
-  "content_type": "tweet",
-  "title": "<string, an internal title for the tweet, max {limits['tweet_title_max']} chars>",
-  "tweet_text": "<string, the main tweet content, max {limits['tweet_text_max']} chars, required>",
-  "thread_continuation": ["<list of optional strings for a follow-up thread, each max {limits['tweet_thread_item_max']} chars>"],
-  "hashtags": ["<list of relevant string hashtags>"]
-}}}}
-
-
-MANDATORY INSTRUCTIONS:
-
-    For an image_carousel, you MUST generate at least {limits['carousel_min_slides']} slides and at most {limits['carousel_max_slides']} slides.
-    
-    For carousel slides, the "text" field is the PRIMARY content and MUST be detailed, comprehensive, and valuable:
-    - Each slide text should be 400-{limits['carousel_slide_text_max']} characters (aim for longer, more detailed content)
-    - Include multiple sentences with actionable information, examples, or explanations
-    - Provide context, reasoning, or supporting details - not just a single statement
-    - Make the text self-contained and informative without relying solely on the heading
-    - Think of it as a mini-article or detailed explanation, not just a caption
-    
-    The step_heading is just a short label (max {limits['carousel_slide_heading_max']} chars), while the text field is where the real value lies.
-
-    Stirctly Follow the Language Constraint in {content_style}.
-
-    Your entire output must be a single, valid JSON object that matches one of the schemas above.
-
-    Do NOT include content_id in your response.
-
-    The generated text must strictly follow this style: {content_style}
-"""
 
 def generate_content_ideas(transcript: str, style_preset: Optional[str] = None, custom_style: Optional[Dict[str, Any]] = None, content_config: Optional[Dict[str, Any]] = None) -> Optional[List[Dict[str, Any]]]:
     """Generate content ideas with optional style customization and configurable limits"""
