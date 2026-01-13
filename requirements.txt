@@ -36,6 +36,12 @@ markdown2
 chardet
 python-multipart
 
+# URL Content Extraction
+trafilatura>=2.0.0
+
+# HTTP Client (async)
+httpx>=0.27.0
+
 # Testing
 pytest
 requests

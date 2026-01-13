@@ -38,6 +38,7 @@ from core.services.transcript_service import (
 )
 from core.services.document_service import DocumentParser, extract_text_from_document
 from core.services.video_service import get_video_title
+from core.services.brain_service import BrainService
 
 # Import content generation
 from repurpose import (
@@ -82,6 +83,9 @@ def get_db():
 # Include routers
 from api.routers.configuration import router as config_router
 app.include_router(config_router)
+
+from api.routers.brain import router as brain_router
+app.include_router(brain_router)
 
 # Add all endpoint functions from original main.py
 @app.post("/process-video-stream/")
@@ -238,6 +242,15 @@ async def process_video_stream(request: ProcessVideoRequest, db: Session = Depen
             db_video.status = "completed"
             db.commit()
             db.refresh(db_video)
+            
+            # Auto-index video to Brain knowledge base
+            if not db_video.is_indexed:
+                try:
+                    brain_service = BrainService(db)
+                    brain_service.index_video_as_source(db_video)
+                    logging.info(f"Auto-indexed video {db_video.youtube_video_id} to Brain")
+                except Exception as brain_err:
+                    logging.warning(f"Failed to auto-index video to Brain: {brain_err}")
             
             # Prepare final response
             final_response = {
@@ -664,6 +677,15 @@ async def process_video(
             db_video.status = "processed"
             db.commit()
             db.refresh(db_video)
+            
+            # Auto-index video to Brain knowledge base
+            if not db_video.is_indexed:
+                try:
+                    brain_service = BrainService(db)
+                    brain_service.index_video_as_source(db_video)
+                    logging.info(f"Auto-indexed video {db_video.youtube_video_id} to Brain")
+                except Exception as brain_err:
+                    logging.warning(f"Failed to auto-index video to Brain: {brain_err}")
         
         elif repurposed_text_initially_present and db_video.repurposed_text:
             logging.info(f"Attempting to parse stored repurposed_text for video {db_video.youtube_video_id} (DB ID: {db_video.id}) using robust parser.")

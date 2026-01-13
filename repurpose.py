@@ -38,6 +38,9 @@ from core.services.transcript_service import get_english_transcript, TranscriptP
 from core.services.video_service import get_video_title
 from core.services.document_service import DocumentParser
 from core.services.content_service import ContentGenerator
+from core.services.brain_service import BrainService
+from core.services.brain_content_generator import BrainContentGenerator
+from core.database import SessionLocal
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -84,6 +87,27 @@ if not api_key:
 else:
     gemini_base_url = os.getenv("GEMINI_BASE_URL", "https://generativelanguage.googleapis.com/v1beta")
     content_generator = ContentGenerator(api_key=api_key, base_url=gemini_base_url)
+
+def load_presets(filepath: str = "presets.json") -> List[Dict[str, Any]]:
+    """Load style presets from JSON file"""
+    try:
+        # Check current directory and script directory
+        paths_to_check = [
+            filepath,
+            os.path.join(os.path.dirname(os.path.abspath(__file__)), filepath)
+        ]
+        
+        for path in paths_to_check:
+            if os.path.exists(path):
+                with open(path, 'r', encoding='utf-8') as f:
+                    return json.load(f)
+                    
+        console.log(f"[yellow]Presets file not found. Checked: {paths_to_check}[/yellow]")
+        return []
+            
+    except Exception as e:
+        console.log(f"[red]Error loading presets: {e}[/red]")
+        return []
 
 def extract_video_id(url: str) -> Optional[str]:
     """Extracts the 11-character video ID from various YouTube URL formats."""
@@ -458,69 +482,118 @@ def save_other_content_to_csv(other_pieces: List[Union[Reel, Tweet]], output_csv
     except Exception as e:
         console.log(f"[red]Failed to save other content to CSV: {e}[/red]")
 
-def parse_input_source(input_source: str) -> List[dict]:
+def parse_input_source(input_sources: List[str]) -> List[dict]:
     """
-    Parse input source and return list of sources (videos or documents)
+    Parse input sources and return list of sources (videos or documents)
     Returns list of dicts: {"type": "video"|"document", "value": video_id|file_path, "name": display_name}
     """
     sources = []
     
-    if os.path.isfile(input_source):
-        ext = os.path.splitext(input_source)[1].lower()
+    # Ensure input is a list
+    if isinstance(input_sources, str):
+        input_sources = [input_sources]
         
-        # Check if it's a document file that should be processed directly
-        if DocumentParser.is_supported(input_source):
-            console.log(f"📄 Document file detected: [cyan]{input_source}[/cyan]")
-            sources.append({
-                "type": "document",
-                "value": input_source,
-                "name": os.path.basename(input_source)
-            })
-            return sources
-        
-        # Otherwise, it's a list file (CSV/TXT) containing video IDs
-        console.log(f"📄 Reading video list from: [cyan]{input_source}[/cyan]")
-        try:
-            if ext == '.csv':
-                df = pd.read_csv(input_source, dtype=str, keep_default_na=False)
-                col = 'video_id' if 'video_id' in df.columns else 'video_url'
-                for item in df[col].dropna():
-                    vid = extract_video_id(item)
-                    if vid:
-                        sources.append({
-                            "type": "video",
-                            "value": vid,
-                            "name": vid
+    for input_source in input_sources:
+        # Handle comma-separated string if passed as single arg
+        if ',' in input_source and not os.path.exists(input_source):
+            sub_sources = [s.strip() for s in input_source.split(',') if s.strip()]
+            for sub in sub_sources:
+                vid = extract_video_id(sub)
+                if vid:
+                    sources.append({
+                        "type": "video", 
+                        "value": vid, 
+                        "name": vid
+                    })
+            continue
+
+        if os.path.isfile(input_source):
+            ext = os.path.splitext(input_source)[1].lower()
+            
+            # Check if it's a document file that should be processed directly
+            if DocumentParser.is_supported(input_source):
+                console.log(f"📄 Document file detected: [cyan]{input_source}[/cyan]")
+                sources.append({
+                    "type": "document",
+                    "value": input_source,
+                    "name": os.path.basename(input_source)
+                })
+                continue
+            
+            # Otherwise, it's a list file (CSV/TXT) containing video IDs or file paths
+            console.log(f"📄 Reading list from: [cyan]{input_source}[/cyan]")
+            try:
+                items_to_process = []
+                if ext == '.csv':
+                    df = pd.read_csv(input_source, dtype=str, keep_default_na=False)
+                    # Look for likely columns
+                    potential_cols = ['video_id', 'video_url', 'file_path', 'path', 'url', 'source']
+                    col = next((c for c in potential_cols if c in df.columns), None)
+                    
+                    if col:
+                        items_to_process = df[col].dropna().tolist()
+                    elif not df.empty:
+                        # Fallback: use first column
+                        items_to_process = df.iloc[:, 0].dropna().tolist()
+                        
+                elif ext == '.txt':
+                    with open(input_source, 'r', encoding='utf-8') as f:
+                        items_to_process = [line.strip() for line in f if line.strip() and not line.strip().startswith('#')]
+                
+                # Process extracted items (check if they are videos or files)
+                for item in items_to_process:
+                    # Check if it's a file path first
+                    if os.path.isfile(item) and DocumentParser.is_supported(item):
+                         sources.append({
+                            "type": "document",
+                            "value": item,
+                            "name": os.path.basename(item)
                         })
-            elif ext == '.txt':
-                with open(input_source, 'r', encoding='utf-8') as f:
-                    for line in f:
-                        line = line.strip()
-                        if not line or line.startswith('#'):
-                            continue
-                        vid = extract_video_id(line)
+                    else:
+                        # Assume it's a video ID/URL
+                        vid = extract_video_id(item)
                         if vid:
                             sources.append({
                                 "type": "video",
                                 "value": vid,
                                 "name": vid
                             })
-        except Exception as e:
-            console.log(f"[red]Error reading file {input_source}: {e}[/red]")
-    else:
-        # Command-line argument (comma-separated video IDs/URLs)
-        console.log("⌨️  Reading from command-line argument")
-        for item in input_source.split(','):
-            item = item.strip()
-            if not item:
-                continue
-            vid = extract_video_id(item)
+                            
+            except Exception as e:
+                console.log(f"[red]Error reading file {input_source}: {e}[/red]")
+        else:
+            # Not a file, check if it's a URL
+            vid = extract_video_id(input_source)
             if vid:
                 sources.append({
                     "type": "video",
                     "value": vid,
                     "name": vid
                 })
+            elif input_source.startswith(('http://', 'https://')):
+                # It's a URL - check if it's a valid web article (not YouTube/blocked)
+                from core.services.url_service import URLExtractor, URLExtractionError
+                try:
+                    URLExtractor.validate_url(input_source)
+                    sources.append({
+                        "type": "url",
+                        "value": input_source,
+                        "name": input_source
+                    })
+                except URLExtractionError as e:
+                    # Check if it's a YouTube URL, treat as video
+                    if URLExtractor.is_youtube_url(input_source):
+                        vid = extract_video_id(input_source)
+                        if vid:
+                            sources.append({
+                                "type": "video",
+                                "value": vid,
+                                "name": vid
+                            })
+                    else:
+                        console.log(f"[yellow]⚠ Blocked URL: {e}[/yellow]")
+            else:
+                 console.log(f"[yellow]⚠ Could not identify source type for: '{input_source}'[/yellow]")
     
     # Remove duplicates while preserving order
     seen = set()
@@ -533,13 +606,19 @@ def parse_input_source(input_source: str) -> List[dict]:
     
     return unique_sources
 
-def process_sources(sources: List[dict], content_config: Optional[Dict[str, Any]] = None):
-    """Process both video and document sources with optional configuration"""
+
+def process_sources(sources: List[dict], content_config: Optional[Dict[str, Any]] = None, custom_style: Optional[Dict[str, Any]] = None) -> List:
+    """Process both video and document sources with optional configuration
+    
+    Returns:
+        List of all generated content pieces (Reel, Tweet, ImageCarousel)
+    """
     if not sources:
         console.log("[yellow]⚠ No sources found to process.[/yellow]")
-        return
+        return []
     
     summary = {"reels": 0, "tweets": 0, "carousels": 0}
+    all_content_pieces = []  # Collect all generated pieces
 
     with Progress(
         SpinnerColumn(), TextColumn("[progress.description]{task.description}"), BarColumn(),
@@ -556,7 +635,49 @@ def process_sources(sources: List[dict], content_config: Optional[Dict[str, Any]
             console.rule(f"[bold]Source {idx}/{len(sources)}[/]", style="dim")
             
             # Handle based on type
-            if source_type == "document":
+            if source_type == "url":
+                # Add URL to Brain knowledge base
+                from core.services.url_service import URLExtractor, URLExtractionError
+                
+                url = source_value
+                console.log(f"🌐 URL: [bold]{url[:50]}{'...' if len(url) > 50 else ''}[/]")
+                progress.update(main_task, description=f"[{idx}/{len(sources)}] Extracting URL...")
+                
+                try:
+                    extracted = URLExtractor.extract_from_url(url)
+                    title = extracted["title"] or url
+                    content = extracted["content"]
+                    word_count = len(content.split()) if content else 0
+                    
+                    console.log(f"[green]✓[/] Extracted {word_count} words: [bold]{title[:50]}{'...' if len(title) > 50 else ''}[/]")
+                    
+                    # Add to Brain
+                    db = SessionLocal()
+                    brain_service = BrainService(db)
+                    source_obj = brain_service.create_source(
+                        title=title,
+                        content=content,
+                        source_type="url",
+                        source_metadata={
+                            "original_url": url,
+                            "author": extracted.get("author"),
+                            "date": extracted.get("date"),
+                            "sitename": extracted.get("sitename"),
+                        },
+                    )
+                    db.close()
+                    
+                    console.log(f"[green]✓[/] Added to Brain: [bold]{source_obj.source_id}[/]")
+                    
+                except URLExtractionError as e:
+                    console.log(f"[red]✗[/] URL extraction failed: {e}")
+                except Exception as e:
+                    console.log(f"[red]✗[/] Failed to process URL: {str(e)[:100]}")
+                
+                progress.update(main_task, advance=1)
+                continue
+            
+            elif source_type == "document":
                 # Process document
                 console.log(f"📄 Document: [bold]{source_name}[/]")
                 progress.update(main_task, description=f"[{idx}/{len(sources)}] {source_name[:30]}...")
@@ -649,7 +770,7 @@ def process_sources(sources: List[dict], content_config: Optional[Dict[str, Any]
                 continue
             
             console.log(f"[cyan]💡[/] Generating content ideas...")
-            raw_ideas = generate_content_ideas(transcript_text, content_config=content_config)
+            raw_ideas = generate_content_ideas(transcript_text, content_config=content_config, custom_style=custom_style)
             if not raw_ideas:
                 console.log(f"[yellow]⚠[/] No ideas generated for {video_id}")
                 progress.update(main_task, advance=1)
@@ -664,12 +785,15 @@ def process_sources(sources: List[dict], content_config: Optional[Dict[str, Any]
                 continue
 
             console.log(f"[cyan]✨[/] Creating content pieces...")
-            all_pieces = generate_specific_content_pieces(validated_ideas, transcript_text, video_url, content_config=content_config).pieces
+            all_pieces = generate_specific_content_pieces(validated_ideas, transcript_text, video_url, content_config=content_config, custom_style=custom_style).pieces
             if not all_pieces:
                 console.log(f"[yellow]⚠[/] No content pieces generated")
                 progress.update(main_task, advance=1)
                 continue
 
+            # Add to collection for potential publishing
+            all_content_pieces.extend(all_pieces)
+            
             carousels = [p for p in all_pieces if isinstance(p, ImageCarousel)]
             others = [p for p in all_pieces if not isinstance(p, ImageCarousel)]
             
@@ -721,10 +845,227 @@ def process_sources(sources: List[dict], content_config: Optional[Dict[str, Any]
         console.print(f"📁 All files saved to: [cyan]{os.path.abspath(OUTPUT_DIR)}[/]")
     else:
         console.print("[yellow]⚠ No content was generated[/]")
+    
+    return all_content_pieces
 
-if __name__ == "__main__":
+
+def handle_brain_command(args):
+    """Handle Brain knowledge base CLI commands"""
+    import json
+    
+    db = SessionLocal()
+    brain_service = BrainService(db)
+    
+    try:
+        if args.brain_stats:
+            # Show Brain statistics
+            sources, total = brain_service.get_sources(limit=1000)
+            
+            console.print()
+            console.rule("[bold cyan]🧠 Brain Knowledge Base Stats[/]")
+            console.print()
+            console.print(f"  Total Sources: [bold green]{total}[/]")
+            
+            # Count by type
+            type_counts = {}
+            for source in sources:
+                t = source.source_type
+                type_counts[t] = type_counts.get(t, 0) + 1
+            
+            console.print()
+            console.print("  [bold]By Type:[/]")
+            for source_type, count in sorted(type_counts.items()):
+                console.print(f"    • {source_type}: {count}")
+            
+            console.print()
+        
+        elif args.brain_list:
+            # List Brain sources
+            sources, total = brain_service.get_sources(limit=50)
+            
+            console.print()
+            console.rule(f"[bold cyan]🧠 Brain Sources ({total} total)[/]")
+            console.print()
+            
+            if not sources:
+                console.print("  [yellow]No sources in Brain yet.[/]")
+                console.print("  Process videos or add sources via API to populate Brain.")
+            else:
+                for source in sources[:20]:
+                    title = source.title[:60] + "..." if len(source.title) > 60 else source.title
+                    console.print(f"  [{source.source_type}] [bold]{source.source_id}[/]: {title}")
+                
+                if total > 20:
+                    console.print(f"\n  [dim]... and {total - 20} more[/]")
+            
+            console.print()
+        
+        elif args.brain_search:
+            # Search Brain sources
+            results = brain_service.search_sources(
+                query=args.brain_search,
+                limit=10,
+                min_score=0.2,
+            )
+            
+            console.print()
+            console.rule(f"[bold cyan]🔍 Brain Search: '{args.brain_search}'[/]")
+            console.print()
+            
+            if not results:
+                console.print("  [yellow]No matching sources found.[/]")
+            else:
+                console.print(f"  Found [bold green]{len(results)}[/] matching sources:\n")
+                
+                for r in results:
+                    source = r["source"]
+                    score = r["score"]
+                    snippet = r["snippet"][:100] + "..." if len(r["snippet"]) > 100 else r["snippet"]
+                    
+                    console.print(f"  [bold]{source.source_id}[/] (score: {score:.0%})")
+                    console.print(f"    Title: {source.title}")
+                    console.print(f"    Snippet: [dim]{snippet}[/]")
+                    console.print()
+            
+        elif args.vision:
+            # Vision-based generation
+            if not content_generator:
+                console.print("[red]Error: GEMINI_API_KEY required for generation[/]")
+                return
+            
+            brain_generator = BrainContentGenerator(brain_service, content_generator)
+            
+            console.print()
+            console.rule("[bold cyan]✨ Vision-Based Generation[/]")
+            console.print(f"\n  Your idea: [italic]{args.vision}[/]\n")
+            
+            with Progress(
+                SpinnerColumn(),
+                TextColumn("[progress.description]{task.description}"),
+                console=console,
+            ) as progress:
+                task = progress.add_task("Generating content...", total=None)
+                
+                result = brain_generator.generate_from_vision(
+                    user_vision=args.vision,
+                    content_types=["reel", "tweet"],
+                    max_sources=5,
+                    min_match_score=0.3,
+                )
+            
+            console.print(f"  Session: [bold]{result['session_id']}[/]")
+            console.print(f"  Matched Sources: {result['total_matches']}")
+            console.print(f"  Generated: {len(result['generated_content'])} pieces\n")
+            
+            # Show matched sources
+            if result['matched_sources']:
+                console.print("  [bold]Matched Sources:[/]")
+                for ms in result['matched_sources'][:3]:
+                    console.print(f"    • {ms['title']} (score: {ms['match_score']:.0%})")
+                console.print()
+            
+            # Show generated content
+            for piece in result['generated_content']:
+                console.print(f"  [bold green]{piece.get('content_type', 'unknown')}[/]: {piece.get('title', 'Untitled')}")
+            
+            console.print()
+        
+        elif args.from_brain:
+            # Generate from specific sources
+            if not content_generator:
+                console.print("[red]Error: GEMINI_API_KEY required for generation[/]")
+                return
+            
+            source_ids = [s.strip() for s in args.from_brain.split(",")]
+            brain_generator = BrainContentGenerator(brain_service, content_generator)
+            
+            console.print()
+            console.rule("[bold cyan]🎯 Generating from Brain Sources[/]")
+            console.print(f"\n  Sources: {', '.join(source_ids)}\n")
+            
+            with Progress(
+                SpinnerColumn(),
+                TextColumn("[progress.description]{task.description}"),
+                console=console,
+            ) as progress:
+                task = progress.add_task("Generating content...", total=None)
+                
+                if len(source_ids) == 1:
+                    result = brain_generator.generate_from_single_source(
+                        source_id=source_ids[0],
+                        content_types=["reel", "tweet"],
+                    )
+                else:
+                    result = brain_generator.generate_from_multiple_sources(
+                        source_ids=source_ids,
+                        content_count=5,
+                        content_types=["reel", "tweet"],
+                    )
+            
+            console.print(f"  Session: [bold]{result['session_id']}[/]")
+            console.print(f"  Generated: {result['content_count']} pieces\n")
+            
+            for piece in result['generated_content']:
+                console.print(f"  [bold green]{piece.get('content_type', 'unknown')}[/]: {piece.get('title', 'Untitled')}")
+            
+            console.print()
+        
+        elif getattr(args, 'add_url', None):
+            # Add URL to Brain
+            from core.services.url_service import URLExtractor, URLExtractionError
+            
+            url = args.add_url
+            console.print()
+            console.rule("[bold cyan]🌐 Adding URL to Brain[/]")
+            console.print(f"\n  URL: [cyan]{url}[/]\n")
+            
+            with Progress(
+                SpinnerColumn(),
+                TextColumn("[progress.description]{task.description}"),
+                console=console,
+            ) as progress:
+                task = progress.add_task("Extracting content...", total=None)
+                
+                try:
+                    extracted = URLExtractor.extract_from_url(url)
+                except URLExtractionError as e:
+                    console.print(f"\n  [red]Error: {e}[/]")
+                    return
+            
+            title = extracted["title"] or url
+            content = extracted["content"]
+            word_count = len(content.split()) if content else 0
+            
+            console.print(f"  ✓ Extracted [bold green]{word_count}[/] words")
+            console.print(f"  Title: [bold]{title}[/]")
+            if extracted.get("author"):
+                console.print(f"  Author: {extracted['author']}")
+            if extracted.get("sitename"):
+                console.print(f"  Site: {extracted['sitename']}")
+            
+            # Create Brain source
+            source = brain_service.create_source(
+                title=title,
+                content=content,
+                source_type="url",
+                source_metadata={
+                    "original_url": url,
+                    "author": extracted.get("author"),
+                    "date": extracted.get("date"),
+                    "sitename": extracted.get("sitename"),
+                },
+            )
+            
+            console.print(f"\n  ✓ Added to Brain: [bold]{source.source_id}[/]")
+            console.print()
+    
+    finally:
+        db.close()
+
+
+def main():
     parser = argparse.ArgumentParser(
-        description="🎬 Content Repurposing Tool - Generate social media content from videos & documents",
+        description="Content Repurposing Tool - Generate social media content from videos & documents",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
@@ -737,6 +1078,12 @@ Examples:
   # Document file (TXT, MD, DOCX, PDF)
   python repurpose.py article.pdf
   python repurpose.py notes.md
+  
+  # URL (web article) - auto-added to Brain
+  python repurpose.py "https://example.com/article"
+  
+  # Add URL to Brain explicitly
+  python repurpose.py --add-url "https://blog.example.com/post"
   
   # Video list from file
   python repurpose.py videos.txt
@@ -757,7 +1104,7 @@ Examples:
   python repurpose.py --show-config
         """
     )
-    parser.add_argument("input_source", nargs='?', help="Video URLs/IDs, document file (.txt/.md/.docx/.pdf), or list file")
+    parser.add_argument("input_source", nargs='*', help="Video URLs/IDs, document files (.txt/.md/.docx/.pdf), or list files (.csv/.txt)")
     parser.add_argument("-l", "--limit", type=int, metavar="N", help="Process only first N videos")
     
     # Configuration options
@@ -772,14 +1119,47 @@ Examples:
                             help="Min content ideas to generate (default: 6)")
     config_group.add_argument("--max-ideas", type=int, metavar="N",
                             help="Max content ideas to generate (default: 8)")
+    config_group.add_argument("--preset", type=str, metavar="NAME",
+                            help="Name of the style preset to use (matched loosely)")
+    config_group.add_argument("--list-presets", action="store_true",
+                            help="List available style presets")
     config_group.add_argument("--show-config", action="store_true",
                             help="Show current configuration and exit")
+    
+    # Brain Knowledge Base options
+    brain_group = parser.add_argument_group('Brain Knowledge Base', 'Use your indexed content for generation')
+    brain_group.add_argument("--brain-list", action="store_true",
+                            help="List sources in Brain knowledge base")
+    brain_group.add_argument("--brain-search", type=str, metavar="QUERY",
+                            help="Search Brain for matching sources")
+    brain_group.add_argument("--from-brain", type=str, metavar="IDS",
+                            help="Generate content from Brain source IDs (comma-separated)")
+    brain_group.add_argument("--vision", type=str, metavar="IDEA",
+                            help="Generate content based on your idea using Brain sources")
+    brain_group.add_argument("--brain-stats", action="store_true",
+                            help="Show Brain knowledge base statistics")
+    brain_group.add_argument("--add-url", type=str, metavar="URL",
+                            help="Add a URL to Brain (extracts main content as Markdown)")
     
     args = parser.parse_args()
     
     # Check if input_source is required
-    if not args.show_config and not args.input_source:
-        parser.error("input_source is required unless --show-config is used")
+    brain_command = args.brain_list or args.brain_search or args.from_brain or args.vision or args.brain_stats or getattr(args, 'add_url', None)
+    if not args.show_config and not args.list_presets and not brain_command and not args.input_source:
+        parser.error("input_source is required unless using --show-config, --list-presets, or Brain commands")
+    
+    # Handle list-presets option
+    if args.list_presets:
+        presets = load_presets()
+        if not presets:
+            console.print("[red]No presets found or presets file is empty.[/red]")
+        else:
+            console.print("[bold cyan]Available Presets:[/bold cyan]")
+            for i, p in enumerate(presets, 1):
+                name = p.get('name', 'Unnamed')
+                tone = p.get('tone', 'N/A')
+                console.print(f"  {i}. [bold]{name}[/bold] (Tone: {tone})")
+        sys.exit(0)
     
     # Handle show-config option
     if args.show_config:
@@ -799,6 +1179,11 @@ Examples:
         console.print(f"  Max Ideas:       8")
         console.print()
         console.print("💡 [dim]Use --carousel-text-max, --carousel-slides-min, etc. to override[/]")
+        sys.exit(0)
+    
+    # Handle Brain commands
+    if args.brain_list or args.brain_search or args.from_brain or args.vision or args.brain_stats or getattr(args, 'add_url', None):
+        handle_brain_command(args)
         sys.exit(0)
     
     # Build content config from CLI arguments
@@ -868,7 +1253,28 @@ Examples:
         console.rule("[dim]Starting Processing[/]", style="dim")
         console.print()
         
-        process_sources(sources, content_config=cli_content_config if cli_content_config else None)
+        # Load preset if specified
+        custom_style = None
+        if args.preset:
+            presets = load_presets()
+            # Find partial or exact match (case-insensitive)
+            matches = [p for p in presets if args.preset.lower() in p.get('name', '').lower()]
+            
+            if not matches:
+                console.print(f"[red]No preset found matching '{args.preset}'[/red]")
+                console.print("Use --list-presets to see available options.")
+                sys.exit(1)
+            
+            if len(matches) > 1:
+                console.print(f"[yellow]Multiple presets match '{args.preset}'. Using the first one: '{matches[0].get('name')}'[/yellow]")
+            
+            selected_preset = matches[0]
+            console.print(f"🎨 Using Style Preset: [bold cyan]{selected_preset.get('name')}[/bold cyan]")
+            
+            # Use the whole preset object as custom_style since we aligned the fields
+            custom_style = selected_preset
+
+        content_pieces = process_sources(sources, content_config=cli_content_config if cli_content_config else None, custom_style=custom_style)
 
     except KeyboardInterrupt:
         console.print("\n\n[yellow]⚠ Interrupted by user[/]")
@@ -883,3 +1289,6 @@ Examples:
         console.rule(style="dim")
         console.print(f"[bold green]✓[/] Completed in [cyan]{duration:.2f}s[/]")
         console.rule("[bold blue]🏁 Finished[/]", style="blue")
+
+if __name__ == "__main__":
+    main()

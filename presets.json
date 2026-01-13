@@ -1,0 +1,74 @@
+[
+    {
+        "name": "Botomation: Full-Service Digital Transformation",
+        "target_audience": "Primary Audience: Founders, CEOs, and COOs of growing businesses.\nNeeds: Scaling operations without increasing headcount, improving operational efficiency, and modernizing legacy systems.\nPain Points: Slow websites killing conversions, high operational costs due to manual tasks, and inability to leverage AI effectively.",
+        "call_to_action": "Ready to automate your growth? Book a free consultation call below.",
+        "content_goal": "Education, Brand Awareness, Lead Generation",
+        "language": "English",
+        "tone": "Professional, Authoritative, Innovative",
+        "additional_instructions": "Context: Botomation is a next-gen digital agency combining custom web development with AI automation. Emphasize speed, efficiency, and replacing legacy systems/manual work with custom code and AI agents. Value Prop: We combine high-speed custom web development with intelligent AI automation to build revenue engines, not just websites."
+    },
+    {
+        "name": "Botomation: AI Sales & Support Ecosystems",
+        "target_audience": "Primary Audience: Customer Support Managers, Sales Directors, and E-commerce businesses.\nNeeds: Reducing response times, handling high inquiry volumes, and increasing sales through chat.\nPain Points: Losing leads due to slow responses, high support staff costs, and missed upselling opportunities.",
+        "call_to_action": "Ready to automate your growth? Book a free consultation call below.",
+        "content_goal": "Lead Generation, Customer Education, Sales Enablement",
+        "language": "English",
+        "tone": "Helpful, Efficient, Results-Oriented",
+        "additional_instructions": "Context: Botomation turns chat inboxes into automated sales machines with AI agents for WhatsApp, Instagram, Messenger, and Shopify. Features: 24/7 Instant Response, Smart Upselling, Automated Sales Rep logic. Purpose: Reduce wait times to zero and increase AOV."
+    },
+    {
+        "name": "Botomation: E-commerce Growth Engine",
+        "target_audience": "Primary Audience: Shopify Store Owners, E-commerce Managers, and DTC Brands.\nNeeds: Automating post-purchase support, increasing conversion rates, and reducing support overhead.\nPain Points: High volume of 'where is my order' tickets, cart abandonment, and overwhelmed support teams.",
+        "call_to_action": "Ready to automate your growth? Book a free consultation call below.",
+        "content_goal": "Conversion Optimization, Customer Retention, Support Automation",
+        "language": "English",
+        "tone": "Growth-Focused, Specific, Reliable",
+        "additional_instructions": "Context: Deeply integrated AI agents specifically for Shopify/E-commerce. Focus on automating support (tracking, returns), reducing tickets by 80%, recovering abandoned carts, and providing real-time updates."
+    },
+    {
+        "name": "Botomation: High-Performance Web Development",
+        "target_audience": "Primary Audience: Marketing Directors, SEO Specialists, and Small Business Owners.\nNeeds: High-converting websites, better SEO rankings, and fast turnaround times.\nPain Points: Slow, bloated WordPress sites, poor mobile performance, and high bounce rates due to load times.",
+        "call_to_action": "Ready to automate your growth? Book a free consultation call below.",
+        "content_goal": "SEO Awareness, Performance Education, Vendor Switching",
+        "language": "English",
+        "tone": "Technical yet Accessible, Performance-Driven, Competitive",
+        "additional_instructions": "Context: Hand-coded, custom development that crushes competition in speed and SEO. Guaranteed 100/100 PageSpeed scores. 'No Bloat'. emphasis on Custom Identity and Security vs basic WordPress sites."
+    },
+    {
+        "name": "Botomation: Business Process Automation",
+        "target_audience": "Primary Audience: Operations Managers, COOs, and Admin-heavy Service Businesses.\nNeeds: Streamlining workflows, reducing manual data entry, and integrating disparate software tools.\nPain Points: Time wasted on repetitive admin tasks, data entry errors, and disconnected systems.",
+        "call_to_action": "Ready to automate your growth? Book a free consultation call below.",
+        "content_goal": "Operational Efficiency, Cost Reduction, Error Elimination",
+        "language": "English",
+        "tone": "Systematic, Organized, Efficiency-Focused",
+        "additional_instructions": "Context: The 'glue' connecting business tools (Email, CRM, Spreadsheets). Focus on eliminating manual entry, copy-pasting, and human error. Back-office automation to streamline admin workflows."
+    },
+    {
+        "name": "Botomation: Automated Lead Generation",
+        "target_audience": "Primary Audience: B2B Sales Teams, Growth Marketers, and Agencies.\nNeeds: Consistent lead flow, market intelligence, and automated prospecting.\nPain Points: Time-consuming manual research, stale lead lists, and lack of market visibility.",
+        "call_to_action": "Ready to automate your growth? Book a free consultation call below.",
+        "content_goal": "Lead Generation, Sales Acceleration, Market Intelligence",
+        "language": "English",
+        "tone": "Proactive, Data-Driven, Growth-Hacking",
+        "additional_instructions": "Context: Custom tools that scan the web to find potential clients and trends. Automated Prospecting, Competitor Tracking, delivering fresh qualified leads. Stop searching manually."
+    },
+    {
+        "name": "Botomation: AI Content & Media Engine",
+        "target_audience": "Primary Audience: Social Media Managers, Brand Builders, and Content Creators.\nNeeds: Consistent content output, scaling social media presence, and reducing content production time.\nPain Points: Burnout from content creation, inconsistent posting schedules, and writer's block.",
+        "call_to_action": "Ready to automate your growth? Book a free consultation call below.",
+        "content_goal": "Content Consistency, Brand Scaling, Automation",
+        "language": "English",
+        "tone": "Creative, Energetic, Consistent",
+        "additional_instructions": "Context: Automating consistency. End-to-end social automation (visuals, captions, publishing). Viral Script Writing for Reels/TikToks. Brand Voice Consistency. 24/7 Activity."
+    },
+    {
+        "name": "Botomation: Global Voice Cloning & Dubbing",
+        "target_audience": "Primary Audience: YouTubers, Educational Content Creators, and Global Brands.\nNeeds: Expanding international reach, localizing content efficiently, and maintaining brand identity.\nPain Points: High cost and time of traditional dubbing, limited audience reach due to language barriers.",
+        "call_to_action": "Ready to automate your growth? Book a free consultation call below.",
+        "content_goal": "Global Reach, Localization, Innovation",
+        "language": "English",
+        "tone": "Global, Innovative, Inclusive",
+        "additional_instructions": "Context: Go global immediately by dubbing videos. Advanced Voice Cloning retaining original identity. Multi-Language Support. No Re-recording needed."
+    }
+]

@@ -161,3 +161,259 @@ class EditContentResponse(BaseModel):
 class ChannelRequest(BaseModel):
     channel_id: str
     max_videos: int = Field(..., ge=1, description="Maximum number of videos to return.")
+
+
+# ============================================================================
+# Brain Knowledge Base Models (v2.0)
+# ============================================================================
+
+class BrainSourceBase(BaseModel):
+    """Base fields for Brain source"""
+    title: str = Field(..., min_length=1, max_length=500, description="Title of the source")
+    content: str = Field(..., min_length=1, description="Main content text")
+    source_type: Literal["youtube", "document", "text", "url"] = Field(..., description="Type of source")
+    summary: Optional[str] = Field(None, max_length=1000, description="AI-generated summary")
+    topics: Optional[List[str]] = Field(None, description="Extracted topics")
+    tags: Optional[List[str]] = Field(None, description="User-defined tags")
+    source_metadata: Optional[Dict[str, Any]] = Field(None, description="Source-specific metadata")
+
+
+class BrainSourceCreate(BrainSourceBase):
+    """Request model for creating a Brain source"""
+    pass
+
+
+class URLExtractOptions(BaseModel):
+    """Options for URL content extraction"""
+    include_tables: bool = Field(default=True, description="Include tables in extracted content")
+    include_links: bool = Field(default=True, description="Preserve hyperlinks in content")
+    include_images: bool = Field(default=False, description="Include image references")
+
+
+class URLSourceCreate(BaseModel):
+    """Request model for creating a Brain source from URL"""
+    url: str = Field(..., min_length=10, description="URL to fetch and extract content from")
+    title: Optional[str] = Field(None, max_length=500, description="Custom title (auto-extracted if not provided)")
+    tags: Optional[List[str]] = Field(None, description="User-defined tags")
+    extract_options: Optional[URLExtractOptions] = Field(
+        default_factory=URLExtractOptions,
+        description="Content extraction options"
+    )
+
+
+class BrainSourceUpdate(BaseModel):
+    """Request model for updating a Brain source"""
+    title: Optional[str] = Field(None, min_length=1, max_length=500)
+    content: Optional[str] = Field(None, min_length=1)
+    summary: Optional[str] = Field(None, max_length=1000)
+    topics: Optional[List[str]] = None
+    tags: Optional[List[str]] = None
+    source_metadata: Optional[Dict[str, Any]] = None
+
+
+class BrainSourceResponse(BrainSourceBase):
+    """Response model for a Brain source"""
+    source_id: str
+    use_count: int = 0
+    last_used_at: Optional[str] = None
+    created_at: str
+    updated_at: str
+    has_embedding: bool = False
+
+    class Config:
+        from_attributes = True
+
+
+class BrainSourceListResponse(BaseModel):
+    """Paginated list of Brain sources"""
+    sources: List[BrainSourceResponse]
+    total: int
+    page: int
+    page_size: int
+    has_more: bool
+
+
+# ============================================================================
+# Brain Vision-Based Generation Models
+# ============================================================================
+
+class VisionGenerateRequest(BaseModel):
+    """Request for vision-based content generation"""
+    user_vision: str = Field(..., min_length=10, max_length=2000, description="User's content idea/vision")
+    content_types: List[Literal["reel", "image_carousel", "tweet"]] = Field(
+        default=["reel", "tweet"], 
+        description="Types of content to generate"
+    )
+    style_preset: Optional[str] = Field(None, description="Name of style preset to use")
+    custom_style: Optional[CustomContentStyle] = Field(None, description="Custom style configuration")
+    max_sources: int = Field(default=5, ge=1, le=20, description="Max sources to match")
+    min_match_score: float = Field(default=0.5, ge=0.0, le=1.0, description="Minimum relevance score")
+
+
+class MatchedSource(BaseModel):
+    """A source matched to user's vision"""
+    source_id: str
+    title: str
+    source_type: str
+    match_score: float
+    matched_topics: List[str] = []
+    snippet: str = Field(..., description="Relevant content snippet")
+
+
+class VisionGenerateResponse(BaseModel):
+    """Response for vision-based generation"""
+    session_id: str
+    matched_sources: List[MatchedSource]
+    generated_content: List[Dict[str, Any]]
+    total_matches: int
+    status: str
+
+
+# ============================================================================
+# Brain Full AI Mode Models
+# ============================================================================
+
+class AutoGenerateSingleRequest(BaseModel):
+    """Request for single source auto-generation"""
+    source_id: str = Field(..., description="ID of the source to use")
+    content_types: List[Literal["reel", "image_carousel", "tweet"]] = Field(
+        default=["reel", "tweet"]
+    )
+    style_preset: Optional[str] = None
+    custom_style: Optional[CustomContentStyle] = None
+
+
+class AutoGenerateMultipleRequest(BaseModel):
+    """Request for multiple sources auto-generation"""
+    source_ids: List[str] = Field(..., min_length=1, max_length=10, description="Source IDs to use")
+    content_count: int = Field(default=5, ge=1, le=20, description="Number of pieces to generate")
+    content_types: List[Literal["reel", "image_carousel", "tweet"]] = Field(
+        default=["reel", "tweet"]
+    )
+    style_preset: Optional[str] = None
+    custom_style: Optional[CustomContentStyle] = None
+
+
+class AutoGenerateAutoRequest(BaseModel):
+    """Request for auto-selection auto-generation"""
+    content_count: int = Field(default=5, ge=1, le=20, description="Number of pieces to generate")
+    content_types: List[Literal["reel", "image_carousel", "tweet"]] = Field(
+        default=["reel", "tweet"]
+    )
+    source_types: Optional[List[Literal["youtube", "document", "text", "url"]]] = Field(
+        None, description="Filter by source types"
+    )
+    tags: Optional[List[str]] = Field(None, description="Filter by tags")
+    topics: Optional[List[str]] = Field(None, description="Filter by topics")
+    style_preset: Optional[str] = None
+    custom_style: Optional[CustomContentStyle] = None
+
+
+class AutoGenerateResponse(BaseModel):
+    """Response for auto-generation modes"""
+    session_id: str
+    sources_used: List[Dict[str, Any]]
+    generated_content: List[Dict[str, Any]]
+    content_count: int
+    status: str
+
+
+# ============================================================================
+# Brain Hybrid Mode Models
+# ============================================================================
+
+class HybridGenerateRequest(BaseModel):
+    """Request for hybrid source selection generation"""
+    selected_source_ids: List[str] = Field(
+        ..., 
+        min_length=1, 
+        max_length=10, 
+        description="User-selected source IDs"
+    )
+    ai_augment_hint: Optional[str] = Field(
+        None, 
+        max_length=500, 
+        description="Hint for AI to find related sources"
+    )
+    ai_augment_strategy: Literal["augment", "fill", "support"] = Field(
+        default="augment",
+        description="Strategy: augment=add related, fill=complete gaps, support=find supporting"
+    )
+    ai_augment_count: int = Field(
+        default=3, 
+        ge=0, 
+        le=10, 
+        description="Max AI-discovered sources"
+    )
+    content_count: int = Field(default=5, ge=1, le=20)
+    content_types: List[Literal["reel", "image_carousel", "tweet"]] = Field(
+        default=["reel", "tweet"]
+    )
+    style_preset: Optional[str] = None
+    custom_style: Optional[CustomContentStyle] = None
+
+
+class HybridGenerateResponse(BaseModel):
+    """Response for hybrid generation"""
+    session_id: str
+    user_sources: List[Dict[str, Any]]
+    ai_discovered_sources: List[Dict[str, Any]]
+    combined_sources_count: int
+    generated_content: List[Dict[str, Any]]
+    content_count: int
+    status: str
+
+
+# ============================================================================
+# Brain Search Models
+# ============================================================================
+
+class BrainSearchRequest(BaseModel):
+    """Request for semantic search in Brain"""
+    query: str = Field(..., min_length=1, max_length=1000, description="Search query")
+    source_types: Optional[List[Literal["youtube", "document", "text", "url"]]] = None
+    tags: Optional[List[str]] = None
+    topics: Optional[List[str]] = None
+    limit: int = Field(default=10, ge=1, le=50)
+    min_score: float = Field(default=0.3, ge=0.0, le=1.0)
+
+
+class BrainSearchResult(BaseModel):
+    """A single search result"""
+    source_id: str
+    title: str
+    source_type: str
+    relevance_score: float
+    snippet: str
+    topics: List[str] = []
+    tags: List[str] = []
+
+
+class BrainSearchResponse(BaseModel):
+    """Response for Brain search"""
+    results: List[BrainSearchResult]
+    total_results: int
+    query: str
+
+
+# ============================================================================
+# Brain Session Models
+# ============================================================================
+
+class BrainSessionResponse(BaseModel):
+    """Response model for a Brain session"""
+    session_id: str
+    mode: str
+    status: str
+    user_vision: Optional[str] = None
+    selected_source_ids: Optional[List[str]] = None
+    matched_source_ids: Optional[List[str]] = None
+    ai_discovered_source_ids: Optional[List[str]] = None
+    generated_count: Optional[int] = None
+    created_at: str
+    completed_at: Optional[str] = None
+    error_message: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
